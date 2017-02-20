@@ -23,6 +23,17 @@ export default class App extends React.Component {
     return decrypted
   }
 
+  saveToDisk(blob, fileName) {
+    let url = window.URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+
   onInputChange = async ({target: {value}}) => {
     let dataView = new DataView(new ArrayBuffer(4));
     dataView.setUint8(0, value);
@@ -44,7 +55,9 @@ export default class App extends React.Component {
     await new Promise((resolve) => setTimeout(() => {if(reader.readyState == 2) resolve()}, 100));
     let {result} = reader;
     let encrypted = await this.encrypt(result);
-    console.log(encrypted)
+    let decrypted = await this.decrypt(encrypted.encrypted, encrypted.jwk, encrypted.iv);
+    let blob = new Blob([decrypted]);
+    this.saveToDisk(blob, `decrypted ${f.name}`)
   };
 
   render() {
