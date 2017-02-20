@@ -1,12 +1,6 @@
 import React from 'react';
 
 export default class App extends React.Component {
-  state = {data: '', encrypted: '', decrypted: ''};
-
-  componentDidMount() {
-    this.refs.input.focus()
-  }
-
   async encrypt(buffer) {
     let iv = window.crypto.getRandomValues(new Uint8Array(12));
     let key = await window.crypto.subtle.generateKey({name: "AES-GCM", length: 256}, true, ["encrypt", "decrypt"]);
@@ -34,20 +28,6 @@ export default class App extends React.Component {
     window.URL.revokeObjectURL(url);
   }
 
-  onInputChange = async ({target: {value}}) => {
-    let dataView = new DataView(new ArrayBuffer(4));
-    dataView.setUint8(0, value);
-
-    let {iv, jwk, encrypted} = await this.encrypt(dataView);
-    let decrypted = await this.decrypt(encrypted, jwk, iv);
-
-    this.setState({
-      data: parseInt(value),
-      encrypted: new DataView(encrypted).getUint8(),
-      decrypted: new DataView(decrypted).getUint8()
-    });
-  };
-
   onFileInputChange = async ({target: {files}}) => {
     let f = files[0];
     let reader = new FileReader();
@@ -63,11 +43,6 @@ export default class App extends React.Component {
   render() {
     return (
       <div id="content">
-        <input ref='input' value={this.state.data} onChange={this.onInputChange} />
-        <span>{this.state.encrypted}</span>
-        <span style={{marginLeft: '10px'}}>{this.state.decrypted}</span>
-
-        <div />
         <input type='file' onChange={this.onFileInputChange}/>
       </div>
     );
