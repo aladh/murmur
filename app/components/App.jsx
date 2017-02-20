@@ -1,6 +1,9 @@
 import React from 'react';
+import Dropbox from 'dropbox';
 
 export default class App extends React.Component {
+  dbx = new Dropbox({accessToken: ''})
+
   async encrypt(buffer) {
     let iv = window.crypto.getRandomValues(new Uint8Array(12));
     let key = await window.crypto.subtle.generateKey({name: "AES-GCM", length: 256}, true, ["encrypt", "decrypt"]);
@@ -28,21 +31,49 @@ export default class App extends React.Component {
     window.URL.revokeObjectURL(url);
   }
 
+  async uploadToDropbox(blob, fileName) {
+    let response = await this.dbx.filesUpload({
+      path: `/${this.encryptedFileName(fileName)}`,
+      contents: blob
+    });
+    return response
+  }
+
+  async downloadFromDropbox(fileName) {
+    let response = await this.dbx.filesDownload({
+      path: `/${this.encryptedFileName(fileName)}`
+    });
+    return response
+  }
+
+  encryptedFileName(fileName) {
+    return `${fileName}.biimer`
+  }
+
+  async bufferFromBlob(blob) {
+    let reader = new FileReader();
+    reader.readAsArrayBuffer(blob);
+    await new Promise((resolve) => setTimeout(() => {if(reader.readyState == 2) resolve()}, 100));
+    return reader.result
+  }
+
   onFileInputChange = async ({target: {files}}) => {
     let f = files[0];
-    let reader = new FileReader();
-    reader.readAsArrayBuffer(f);
-    await new Promise((resolve) => setTimeout(() => {if(reader.readyState == 2) resolve()}, 100));
-    let {result} = reader;
+    let result = await this.bufferFromBlob(f)
     let encrypted = await this.encrypt(result);
-    let decrypted = await this.decrypt(encrypted.encrypted, encrypted.jwk, encrypted.iv);
-    let blob = new Blob([decrypted]);
-    this.saveToDisk(blob, `decrypted ${f.name}`)
+    let blob = new Blob([encrypted.encrypted]);
+    await this.uploadToDropbox(blob, f.name);
+    let {fileBlob} = await this.downloadFromDropbox(f.name);
+    let decrypted = await this.decrypt(await this.bufferFromBlob(fileBlob), encrypted.jwk, encrypted.iv);
+    // let decrypted = await this.decrypt(encrypted.encrypted, encrypted.jwk, encrypted.iv);
+    let decryptedBlob = new Blob([decrypted]);
+    this.saveToDisk(decryptedBlob, `decrypted ${f.name}`)
   };
 
   render() {
     return (
       <div id="content">
+        <span>Select a file to upload:</span>
         <input type='file' onChange={this.onFileInputChange}/>
       </div>
     );
