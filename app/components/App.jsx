@@ -11,7 +11,7 @@ export default class App extends React.Component {
     let encrypted = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, buffer);
     let jwk = await window.crypto.subtle.exportKey("jwk", key);
 
-    return {iv, jwk: jwk.k, encrypted}
+    return {iv, jwk: jwk.k, encrypted, key}
   }
 
   async decrypt(buffer, jwk, iv) {
@@ -34,7 +34,7 @@ export default class App extends React.Component {
 
   async uploadToDropbox(blob, fileName) {
     let response = await this.dbx.filesUpload({
-      path: `/${this.encryptedFileName(fileName)}`,
+      path: `/${fileName}`,
       contents: blob
     });
     return response
@@ -42,27 +42,25 @@ export default class App extends React.Component {
 
   async downloadFromDropbox(fileName) {
     let response = await this.dbx.filesDownload({
-      path: `/${this.encryptedFileName(fileName)}`
+      path: `/${fileName}`
     });
     return response
   }
 
   async encryptedFileName(fileName, iv, key) {
-    let encrypted = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, new TextEncoder().encode(fileName));
+    let encryptedBuffer = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, new TextEncoder().encode(fileName));
+    let encryptedBufferArray = Array.from(new Uint8Array(encryptedBuffer));
+    let encryptedString = encryptedBufferArray.map(byte => String.fromCharCode(byte)).join('');
 
-    const ctArray = Array.from(new Uint8Array(encrypted));                              // ciphertext as byte array
-    const ctStr = ctArray.map(byte => String.fromCharCode(byte)).join('');
+    return base32.encode(encryptedString)
+  }
 
-    let base32EncryptedText = base32.encode(ctStr);
-    let encryptedTextFromBase32 = base32.decode(base32EncryptedText);
+  async decryptedFileName(encryptedFileName, iv, key) {
+    let encryptedText = base32.decode(encryptedFileName);
+    let encryptedBuffer = new Uint8Array(encryptedText.split('').map(ch => ch.charCodeAt(0)));
+    let decryptedBuffer = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, encryptedBuffer);
 
-    let encryptedBuffer = new Uint8Array(ctStr.split('').map(ch => ch.charCodeAt(0)))
-
-    let decrypted = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, encryptedBuffer);
-
-    let decryptedFileName = new TextDecoder().decode(decrypted)
-
-    return base32EncryptedText
+    return new TextDecoder().decode(decryptedBuffer)
   }
 
   async bufferFromBlob(blob) {
@@ -77,12 +75,13 @@ export default class App extends React.Component {
     let result = await this.bufferFromBlob(f)
     let encrypted = await this.encrypt(result);
     let blob = new Blob([encrypted.encrypted]);
-    await this.uploadToDropbox(blob, f.name);
-    let {fileBlob} = await this.downloadFromDropbox(f.name);
+    let encryptedFileName = await this.encryptedFileName(f.name, encrypted.iv, encrypted.key);
+    let decryptedFileName = await this.decryptedFileName(encryptedFileName, encrypted.iv, encrypted.key);
+    await this.uploadToDropbox(blob, encryptedFileName);
+    let {fileBlob} = await this.downloadFromDropbox(encryptedFileName, encrypted.iv, encrypted.key);
     let decrypted = await this.decrypt(await this.bufferFromBlob(fileBlob), encrypted.jwk, encrypted.iv);
-    // let decrypted = await this.decrypt(encrypted.encrypted, encrypted.jwk, encrypted.iv);
     let decryptedBlob = new Blob([decrypted]);
-    this.saveToDisk(decryptedBlob, `decrypted ${f.name}`)
+    this.saveToDisk(decryptedBlob, `decrypted ${decryptedFileName}`)
   };
 
   render() {
