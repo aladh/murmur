@@ -1741,6 +1741,10 @@ hawk@~3.1.3:
     hoek "2.x.x"
     sntp "1.x.x"
 
+hi-base32@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/hi-base32/-/hi-base32-0.2.0.tgz#ab9eadaef623f0505ab868ff64223c671a675d5e"
+
 hoek@2.x.x:
   version "2.16.3"
   resolved "https://registry.yarnpkg.com/hoek/-/hoek-2.16.3.tgz#20bb7403d3cea398e91dc4710a8ff1b8274a25ed"

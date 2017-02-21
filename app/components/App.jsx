@@ -1,5 +1,6 @@
 import React from 'react';
 import Dropbox from 'dropbox';
+import base32 from 'hi-base32';
 
 export default class App extends React.Component {
   dbx = new Dropbox({accessToken: ''})
@@ -46,8 +47,22 @@ export default class App extends React.Component {
     return response
   }
 
-  encryptedFileName(fileName) {
-    return `${fileName}.biimer`
+  async encryptedFileName(fileName, iv, key) {
+    let encrypted = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, new TextEncoder().encode(fileName));
+
+    const ctArray = Array.from(new Uint8Array(encrypted));                              // ciphertext as byte array
+    const ctStr = ctArray.map(byte => String.fromCharCode(byte)).join('');
+
+    let base32EncryptedText = base32.encode(ctStr);
+    let encryptedTextFromBase32 = base32.decode(base32EncryptedText);
+
+    let encryptedBuffer = new Uint8Array(ctStr.split('').map(ch => ch.charCodeAt(0)))
+
+    let decrypted = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, encryptedBuffer);
+
+    let decryptedFileName = new TextDecoder().decode(decrypted)
+
+    return base32EncryptedText
   }
 
   async bufferFromBlob(blob) {
