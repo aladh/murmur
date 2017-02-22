@@ -66,7 +66,17 @@ export default class App extends React.Component {
   async bufferFromBlob(blob) {
     let reader = new FileReader();
     reader.readAsArrayBuffer(blob);
-    await new Promise((resolve) => setTimeout(() => {if(reader.readyState == 2) resolve()}, 100));
+
+    await new Promise((resolve) => {
+      let interval =
+        setInterval(() => {
+          if(reader.readyState == 2) {
+            clearInterval(interval);
+            resolve()
+          }
+        }, 100)
+    });
+
     return reader.result
   }
 
