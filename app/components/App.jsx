@@ -4,6 +4,8 @@ import base32 from 'hi-base32';
 
 export default class App extends React.Component {
   dbx = new Dropbox({accessToken: ''})
+  state = {linkId: '', key: ''};
+  store = {};
 
   async encrypt(buffer) {
     let iv = window.crypto.getRandomValues(new Uint8Array(12));
@@ -14,11 +16,12 @@ export default class App extends React.Component {
     return {iv, jwk: jwk.k, encrypted, key}
   }
 
-  async decrypt(buffer, jwk, iv) {
-    let importedKey = await window.crypto.subtle.importKey("jwk", {kty: "oct", k: jwk, alg: "A256GCM", ext: true}, {name: "AES-GCM"}, false, ["encrypt", "decrypt"]);
-    let decrypted = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, importedKey, buffer);
+  async decrypt(buffer, key, iv) {
+    return await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, buffer);
+  }
 
-    return decrypted
+  async importKey(jwk) {
+    return await window.crypto.subtle.importKey("jwk", {kty: "oct", k: jwk, alg: "A256GCM", ext: true}, {name: "AES-GCM"}, false, ["encrypt", "decrypt"]);
   }
 
   saveToDisk(blob, fileName) {
@@ -40,11 +43,15 @@ export default class App extends React.Component {
     return response
   }
 
-  async downloadFromDropbox(fileName) {
-    let response = await this.dbx.filesDownload({
-      path: `/${fileName}`
-    });
-    return response
+  async downloadFromDropbox(shareLink) {
+    let coreLink = shareLink.match(/\/s\/(.*)\?/)[1];
+    return fetch(`https://dl.dropboxusercontent.com/1/view/${coreLink}`)
+  }
+
+  async getSharedDropboxLink(fileName) {
+    return await this.dbx.sharingCreateSharedLinkWithSettings({
+        path: `/${fileName}`
+    })
   }
 
   async encryptedFileName(fileName, iv, key) {
@@ -80,25 +87,68 @@ export default class App extends React.Component {
     return reader.result
   }
 
-  onFileInputChange = async ({target: {files}}) => {
+  readStream(readableStream) {
+    const reader = readableStream.getReader();
+    let chunks = [];
+
+    return pump();
+
+    function pump() {
+      return reader.read().then(({ value, done }) => {
+        if (done) {
+          return Uint8Array.from(chunks);
+        }
+
+        chunks = chunks.concat(Array.from(value));
+        return pump();
+      });
+    }
+  }
+
+  async sha256(message) {
+    const msgBuffer = new TextEncoder('utf-8').encode(message);                     // encode as UTF-8
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);            // hash the message
+    const hashArray = Array.from(new Uint8Array(hashBuffer));                       // convert ArrayBuffer to Array
+    const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join(''); // convert bytes to hex string
+    return hashHex;
+}
+
+  uploadFile = async ({target: {files}}) => {
     let f = files[0];
     let result = await this.bufferFromBlob(f)
     let encrypted = await this.encrypt(result);
     let blob = new Blob([encrypted.encrypted]);
     let encryptedFileName = await this.encryptedFileName(f.name, encrypted.iv, encrypted.key);
-    let decryptedFileName = await this.decryptedFileName(encryptedFileName, encrypted.iv, encrypted.key);
     await this.uploadToDropbox(blob, encryptedFileName);
-    let {fileBlob} = await this.downloadFromDropbox(encryptedFileName, encrypted.iv, encrypted.key);
-    let decrypted = await this.decrypt(await this.bufferFromBlob(fileBlob), encrypted.jwk, encrypted.iv);
+    let {url: shareLink} = await this.getSharedDropboxLink(encryptedFileName);
+    let linkId = await this.sha256(encryptedFileName);
+    await this.setState({linkId: linkId, key: encrypted.jwk})
+    this.store[linkId] = {iv: encrypted.iv, fileName: encryptedFileName, link: shareLink}
+  };
+
+  downloadFile = async () => {
+    let fileData = this.store[this.refs.linkId.value];
+    let key = await this.importKey(this.refs.key.value)
+    let decryptedFileName = await this.decryptedFileName(fileData.fileName, fileData.iv, key);
+    let {body: readableStream} = await this.downloadFromDropbox(fileData.link);
+    let data = await this.readStream(readableStream);
+    let decrypted = await this.decrypt(data, key, fileData.iv);
     let decryptedBlob = new Blob([decrypted]);
     this.saveToDisk(decryptedBlob, `decrypted ${decryptedFileName}`)
-  };
+  }
 
   render() {
     return (
       <div id="content">
         <span>Select a file to upload:</span>
-        <input type='file' onChange={this.onFileInputChange}/>
+        <input type='file' onChange={this.uploadFile}/>
+        <span>{`Your link ID is ${this.state.linkId}`}</span>
+        <span>{` Your key is ${this.state.key}`}</span>
+        <div />
+        <span>Enter link id and key to download:</span>
+        <input ref='linkId' />
+        <input ref='key' />
+        <button onClick={this.downloadFile}>Download</button>
       </div>
     );
   }
