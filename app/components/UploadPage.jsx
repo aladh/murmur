@@ -5,7 +5,6 @@ import base32 from 'hi-base32';
 export default class UploadPage extends React.Component {
   dbx = new Dropbox({accessToken: ''});
   state = {linkId: '', key: ''};
-  store = {};
 
   async encrypt(buffer) {
     let iv = window.crypto.getRandomValues(new Uint8Array(12));
@@ -16,36 +15,12 @@ export default class UploadPage extends React.Component {
     return {iv, jwk: jwk.k, encrypted, key}
   }
 
-  async decrypt(buffer, key, iv) {
-    return await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, buffer);
-  }
-
-  async importKey(jwk) {
-    return await window.crypto.subtle.importKey("jwk", {kty: "oct", k: jwk, alg: "A256GCM", ext: true}, {name: "AES-GCM"}, false, ["encrypt", "decrypt"]);
-  }
-
-  saveToDisk(blob, fileName) {
-    let url = window.URL.createObjectURL(blob);
-    let a = document.createElement("a");
-    document.body.appendChild(a);
-    a.style = "display: none";
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  }
-
   async uploadToDropbox(blob, fileName) {
     let response = await this.dbx.filesUpload({
       path: `/${fileName}`,
       contents: blob
     });
     return response
-  }
-
-  async downloadFromDropbox(shareLink) {
-    let coreLink = shareLink.match(/\/s\/(.*)\?/)[1];
-    return fetch(`https://dl.dropboxusercontent.com/1/view/${coreLink}`)
   }
 
   async getSharedDropboxLink(fileName) {
@@ -60,14 +35,6 @@ export default class UploadPage extends React.Component {
     let encryptedString = encryptedBufferArray.map(byte => String.fromCharCode(byte)).join('');
 
     return base32.encode(encryptedString)
-  }
-
-  async decryptedFileName(encryptedFileName, iv, key) {
-    let encryptedText = base32.decode(encryptedFileName);
-    let encryptedBuffer = new Uint8Array(encryptedText.split('').map(ch => ch.charCodeAt(0)));
-    let decryptedBuffer = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, encryptedBuffer);
-
-    return new TextDecoder().decode(decryptedBuffer)
   }
 
   async bufferFromBlob(blob) {
@@ -85,24 +52,6 @@ export default class UploadPage extends React.Component {
     });
 
     return reader.result
-  }
-
-  readStream(readableStream) {
-    const reader = readableStream.getReader();
-    let chunks = [];
-
-    return pump();
-
-    function pump() {
-      return reader.read().then(({ value, done }) => {
-        if (done) {
-          return Uint8Array.from(chunks);
-        }
-
-        chunks = chunks.concat(Array.from(value));
-        return pump();
-      });
-    }
   }
 
   async sha256(message) {
@@ -123,34 +72,16 @@ export default class UploadPage extends React.Component {
     let {url: shareLink} = await this.getSharedDropboxLink(encryptedFileName);
     let linkId = await this.sha256(encryptedFileName);
     await this.setState({linkId: linkId, key: encrypted.jwk})
-    this.store[linkId] = {iv: encrypted.iv, fileName: encryptedFileName, link: shareLink}
+    sessionStorage.setItem(linkId, JSON.stringify({iv: Array.from(encrypted.iv), fileName: encryptedFileName, link: shareLink}))
   };
-
-  downloadFile = async () => {
-    let fileData = this.store[this.refs.linkId.value];
-    let key = await this.importKey(this.refs.key.value)
-    let decryptedFileName = await this.decryptedFileName(fileData.fileName, fileData.iv, key);
-    let {body: readableStream} = await this.downloadFromDropbox(fileData.link);
-    let data = await this.readStream(readableStream);
-    let decrypted = await this.decrypt(data, key, fileData.iv);
-    let decryptedBlob = new Blob([decrypted]);
-    this.saveToDisk(decryptedBlob, `decrypted ${decryptedFileName}`)
-  }
 
   render() {
     return (
       <div>
         <span>Select a file to upload:</span>
         <input type='file' onChange={this.uploadFile}/>
-        <span>{`Your link ID is ${this.state.linkId}`}</span>
-        <span>{` Your key is ${this.state.key}`}</span>
         <div />
         <span>{`Your share link is: http://localhost:3333/s/${this.state.linkId}#${this.state.key}`}</span>
-        <div />
-        <span>Enter link id and key to download:</span>
-        <input ref='linkId' />
-        <input ref='key' />
-        <button onClick={this.downloadFile}>Download</button>
       </div>
     );
   }
