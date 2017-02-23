@@ -145,6 +145,8 @@ export default class App extends React.Component {
         <span>{`Your link ID is ${this.state.linkId}`}</span>
         <span>{` Your key is ${this.state.key}`}</span>
         <div />
+        <span>{`Your share link is: http://localhost:3333/s/${this.state.linkId}#${this.state.key}`}</span>
+        <div />
         <span>Enter link id and key to download:</span>
         <input ref='linkId' />
         <input ref='key' />
