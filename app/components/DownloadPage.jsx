@@ -59,20 +59,24 @@ export default class DownloadPage extends React.Component {
     return location.pathname.slice(3)
   }
 
-  key() {
-    return location.hash.slice(1)
+  async getKey() {
+    if(!this.key) this.key = await this.importKey(location.hash.slice(1));
+    return this.key
   }
 
   downloadFile = async () => {
-    let fileData = JSON.parse(sessionStorage.getItem(this.linkId()));
-    fileData.iv = Uint8Array.from(fileData.iv);
-    let key = await this.importKey(this.key());
-    let decryptedFileName = await this.decryptedFileName(fileData.fileName, fileData.iv, key);
-    let {body: readableStream} = await this.downloadFromDropbox(fileData.link);
+    let {body: readableStream} = await this.downloadFromDropbox(this.fileData.link);
     let data = await this.readStream(readableStream);
-    let decrypted = await this.decrypt(data, key, fileData.iv);
+    let decrypted = await this.decrypt(data, await this.getKey(), this.fileData.iv);
     let decryptedBlob = new Blob([decrypted]);
-    this.saveToDisk(decryptedBlob, `decrypted ${decryptedFileName}`)
+    this.saveToDisk(decryptedBlob, `decrypted ${this.decryptedFileName}`)
+  }
+
+  async componentDidMount() {
+    this.fileData = JSON.parse(sessionStorage.getItem(this.linkId()));
+    this.fileData.iv = Uint8Array.from(this.fileData.iv);
+    this.decryptedFileName = await this.decryptedFileName(this.fileData.fileName, this.fileData.iv, await this.getKey());
+    this.setState({fileName: this.decryptedFileName})
   }
 
   render() {
