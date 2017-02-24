@@ -39,11 +39,11 @@ const encryptedFileName = async function(fileName, iv, key) {
 };
 
 const sha256 = async function(message) {
-    const msgBuffer = new TextEncoder('utf-8').encode(message);                     // encode as UTF-8
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);            // hash the message
-    const hashArray = Array.from(new Uint8Array(hashBuffer));                       // convert ArrayBuffer to Array
-    const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join(''); // convert bytes to hex string
-    return hashHex;
+  const msgBuffer = new TextEncoder('utf-8').encode(message);                     // encode as UTF-8
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);            // hash the message
+  const hashArray = Array.from(new Uint8Array(hashBuffer));                       // convert ArrayBuffer to Array
+  const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join(''); // convert bytes to hex string
+  return hashHex;
 };
 
 const importKey = async function(jwk) {
@@ -51,22 +51,22 @@ const importKey = async function(jwk) {
 };
 
 const decryptedFileName = async function(encryptedFileName, iv, key) {
-    let encryptedText = base32.decode(encryptedFileName);
-    let encryptedBuffer = new Uint8Array(encryptedText.split('').map(ch => ch.charCodeAt(0)));
-    let decryptedBuffer = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, encryptedBuffer);
+  let encryptedText = base32.decode(encryptedFileName);
+  let encryptedBuffer = new Uint8Array(encryptedText.split('').map(ch => ch.charCodeAt(0)));
+  let decryptedBuffer = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, encryptedBuffer);
 
-    return new TextDecoder().decode(decryptedBuffer)
+  return new TextDecoder().decode(decryptedBuffer)
 };
 
 const saveToDisk = async function(blob, fileName) {
-    let url = window.URL.createObjectURL(blob);
-    let a = document.createElement("a");
-    document.body.appendChild(a);
-    a.style = "display: none";
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    window.URL.revokeObjectURL(url);
+  let url = window.URL.createObjectURL(blob);
+  let a = document.createElement("a");
+  document.body.appendChild(a);
+  a.style = "display: none";
+  a.href = url;
+  a.download = fileName;
+  a.click();
+  window.URL.revokeObjectURL(url);
 };
 
 export default {bufferFromBlob, encrypt, encryptedFileName, sha256, importKey,
