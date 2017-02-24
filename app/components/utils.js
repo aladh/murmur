@@ -1,3 +1,5 @@
+import base32 from 'hi-base32';
+
 const bufferFromBlob = async function(blob) {
   let reader = new FileReader();
   reader.readAsArrayBuffer(blob);
@@ -15,4 +17,29 @@ const bufferFromBlob = async function(blob) {
   return reader.result
 };
 
-export default {bufferFromBlob};
+const encrypt = async function(buffer) {
+  let iv = window.crypto.getRandomValues(new Uint8Array(12));
+  let key = await window.crypto.subtle.generateKey({name: "AES-GCM", length: 256}, true, ["encrypt", "decrypt"]);
+  let encrypted = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, buffer);
+  let jwk = await window.crypto.subtle.exportKey("jwk", key);
+
+  return {iv, jwk: jwk.k, encrypted, key}
+};
+
+const encryptedFileName = async function(fileName, iv, key) {
+  let encryptedBuffer = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, new TextEncoder().encode(fileName));
+  let encryptedBufferArray = Array.from(new Uint8Array(encryptedBuffer));
+  let encryptedString = encryptedBufferArray.map(byte => String.fromCharCode(byte)).join('');
+
+  return base32.encode(encryptedString)
+};
+
+const sha256 = async function(message) {
+    const msgBuffer = new TextEncoder('utf-8').encode(message);                     // encode as UTF-8
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);            // hash the message
+    const hashArray = Array.from(new Uint8Array(hashBuffer));                       // convert ArrayBuffer to Array
+    const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join(''); // convert bytes to hex string
+    return hashHex;
+};
+
+export default {bufferFromBlob, encrypt, encryptedFileName, sha256};
