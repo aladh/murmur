@@ -1,6 +1,7 @@
 import React from 'react';
 import Dropbox from 'dropbox';
 import base32 from 'hi-base32';
+import utils from './utils';
 
 export default class UploadPage extends React.Component {
   dbx = new Dropbox({accessToken: ''});
@@ -37,23 +38,6 @@ export default class UploadPage extends React.Component {
     return base32.encode(encryptedString)
   }
 
-  async bufferFromBlob(blob) {
-    let reader = new FileReader();
-    reader.readAsArrayBuffer(blob);
-
-    await new Promise((resolve) => {
-      let interval =
-        setInterval(() => {
-          if(reader.readyState == 2) {
-            clearInterval(interval);
-            resolve()
-          }
-        }, 100)
-    });
-
-    return reader.result
-  }
-
   async sha256(message) {
     const msgBuffer = new TextEncoder('utf-8').encode(message);                     // encode as UTF-8
     const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);            // hash the message
@@ -64,7 +48,7 @@ export default class UploadPage extends React.Component {
 
   uploadFile = async ({target: {files}}) => {
     let f = files[0];
-    let result = await this.bufferFromBlob(f)
+    let result = await utils.bufferFromBlob(f)
     let encrypted = await this.encrypt(result);
     let blob = new Blob([encrypted.encrypted]);
     let encryptedFileName = await this.encryptedFileName(f.name, encrypted.iv, encrypted.key);
