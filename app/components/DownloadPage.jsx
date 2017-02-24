@@ -1,21 +1,8 @@
 import React from 'react';
-import base32 from 'hi-base32';
 import utils from './utils';
 
 export default class DownloadPage extends React.Component {
   state = {fileName: ''};
-
-  async importKey(jwk) {
-    return await window.crypto.subtle.importKey("jwk", {kty: "oct", k: jwk, alg: "A256GCM", ext: true}, {name: "AES-GCM"}, false, ["encrypt", "decrypt"]);
-  }
-
-  async decryptedFileName(encryptedFileName, iv, key) {
-    let encryptedText = base32.decode(encryptedFileName);
-    let encryptedBuffer = new Uint8Array(encryptedText.split('').map(ch => ch.charCodeAt(0)));
-    let decryptedBuffer = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, encryptedBuffer);
-
-    return new TextDecoder().decode(decryptedBuffer)
-  }
 
   async downloadFromDropbox(shareLink) {
     let coreLink = shareLink.match(/\/s\/(.*)\?/)[1];
@@ -23,41 +10,26 @@ export default class DownloadPage extends React.Component {
     return await response.blob()
   }
 
-  async decrypt(buffer, key, iv) {
-    return await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, buffer);
-  }
-
-  saveToDisk(blob, fileName) {
-    let url = window.URL.createObjectURL(blob);
-    let a = document.createElement("a");
-    document.body.appendChild(a);
-    a.style = "display: none";
-    a.href = url;
-    a.download = fileName;
-    a.click();
-    window.URL.revokeObjectURL(url);
-  }
-
   linkId() {
     return location.pathname.slice(3)
   }
 
   async getKey() {
-    if(!this.key) this.key = await this.importKey(location.hash.slice(1));
+    if(!this.key) this.key = await utils.importKey(location.hash.slice(1));
     return this.key
   }
 
   downloadFile = async () => {
     let data = await this.downloadFromDropbox(this.fileData.link);
-    let decrypted = await this.decrypt(await utils.bufferFromBlob(data), await this.getKey(), this.fileData.iv);
+    let decrypted = await utils.decrypt(await utils.bufferFromBlob(data), await this.getKey(), this.fileData.iv);
     let decryptedBlob = new Blob([decrypted]);
-    this.saveToDisk(decryptedBlob, `decrypted ${this.decryptedFileName}`)
+    utils.saveToDisk(decryptedBlob, `decrypted ${this.decryptedFileName}`)
   }
 
   async componentDidMount() {
     this.fileData = JSON.parse(sessionStorage.getItem(this.linkId()));
     this.fileData.iv = Uint8Array.from(this.fileData.iv);
-    this.decryptedFileName = await this.decryptedFileName(this.fileData.fileName, this.fileData.iv, await this.getKey());
+    this.decryptedFileName = await utils.decryptedFileName(this.fileData.fileName, this.fileData.iv, await this.getKey());
     this.setState({fileName: this.decryptedFileName})
   }
 

@@ -26,6 +26,10 @@ const encrypt = async function(buffer) {
   return {iv, jwk: jwk.k, encrypted, key}
 };
 
+const decrypt = async function(buffer, key, iv) {
+  return await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, buffer);
+};
+
 const encryptedFileName = async function(fileName, iv, key) {
   let encryptedBuffer = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, new TextEncoder().encode(fileName));
   let encryptedBufferArray = Array.from(new Uint8Array(encryptedBuffer));
@@ -42,4 +46,28 @@ const sha256 = async function(message) {
     return hashHex;
 };
 
-export default {bufferFromBlob, encrypt, encryptedFileName, sha256};
+const importKey = async function(jwk) {
+  return await window.crypto.subtle.importKey("jwk", {kty: "oct", k: jwk, alg: "A256GCM", ext: true}, {name: "AES-GCM"}, false, ["encrypt", "decrypt"]);
+};
+
+const decryptedFileName = async function(encryptedFileName, iv, key) {
+    let encryptedText = base32.decode(encryptedFileName);
+    let encryptedBuffer = new Uint8Array(encryptedText.split('').map(ch => ch.charCodeAt(0)));
+    let decryptedBuffer = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, encryptedBuffer);
+
+    return new TextDecoder().decode(decryptedBuffer)
+};
+
+const saveToDisk = async function(blob, fileName) {
+    let url = window.URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    document.body.appendChild(a);
+    a.style = "display: none";
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    window.URL.revokeObjectURL(url);
+};
+
+export default {bufferFromBlob, encrypt, encryptedFileName, sha256, importKey,
+                decrypt, decryptedFileName, saveToDisk};
