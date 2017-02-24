@@ -4,4 +4,18 @@ const download = async function(shareLink) {
   return await response.blob()
 };
 
-export default {download};
+const upload = async function(client, blob, fileName) {
+  let response = await client.filesUpload({
+    path: `/${fileName}`,
+    contents: blob
+  });
+  return response
+};
+
+const getSharedLink = async function(client, fileName) {
+  return await client.sharingCreateSharedLinkWithSettings({
+      path: `/${fileName}`
+  })
+};
+
+export default {download, upload, getSharedLink};
