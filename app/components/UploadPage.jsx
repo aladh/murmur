@@ -2,9 +2,10 @@ import React from 'react';
 import Dropbox from 'dropbox';
 import utils from './utils';
 import dropbox from './dropbox';
+import secrets from '../secrets';
 
 export default class UploadPage extends React.Component {
-  dbx = new Dropbox({accessToken: ''});
+  dbx = new Dropbox({accessToken: secrets.dropboxAccessToken});
   state = {linkId: '', key: ''};
 
   uploadFile = async ({target: {files}}) => {
