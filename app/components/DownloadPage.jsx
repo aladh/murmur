@@ -1,5 +1,6 @@
 import React from 'react';
 import base32 from 'hi-base32';
+import utils from './utils';
 
 export default class DownloadPage extends React.Component {
   state = {fileName: ''};
@@ -18,7 +19,8 @@ export default class DownloadPage extends React.Component {
 
   async downloadFromDropbox(shareLink) {
     let coreLink = shareLink.match(/\/s\/(.*)\?/)[1];
-    return fetch(`https://dl.dropboxusercontent.com/1/view/${coreLink}`)
+    let response = await fetch(`https://dl.dropboxusercontent.com/1/view/${coreLink}`);
+    return await response.blob()
   }
 
   async decrypt(buffer, key, iv) {
@@ -36,25 +38,6 @@ export default class DownloadPage extends React.Component {
     window.URL.revokeObjectURL(url);
   }
 
-
-  readStream(readableStream) {
-    const reader = readableStream.getReader();
-    let chunks = [];
-
-    return pump();
-
-    function pump() {
-      return reader.read().then(({ value, done }) => {
-        if (done) {
-          return Uint8Array.from(chunks);
-        }
-
-        chunks = chunks.concat(Array.from(value));
-        return pump();
-      });
-    }
-  }
-
   linkId() {
     return location.pathname.slice(3)
   }
@@ -65,9 +48,8 @@ export default class DownloadPage extends React.Component {
   }
 
   downloadFile = async () => {
-    let {body: readableStream} = await this.downloadFromDropbox(this.fileData.link);
-    let data = await this.readStream(readableStream);
-    let decrypted = await this.decrypt(data, await this.getKey(), this.fileData.iv);
+    let data = await this.downloadFromDropbox(this.fileData.link);
+    let decrypted = await this.decrypt(await utils.bufferFromBlob(data), await this.getKey(), this.fileData.iv);
     let decryptedBlob = new Blob([decrypted]);
     this.saveToDisk(decryptedBlob, `decrypted ${this.decryptedFileName}`)
   }
