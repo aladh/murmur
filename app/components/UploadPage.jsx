@@ -8,16 +8,17 @@ export default class UploadPage extends React.Component {
   state = {linkId: '', key: ''};
 
   uploadFile = async ({target: {files}}) => {
-    let f = files[0];
-    let result = await utils.bufferFromBlob(f)
-    let encrypted = await utils.encrypt(result);
-    let blob = new Blob([encrypted.encrypted]);
-    let encryptedFileName = await utils.encryptedFileName(f.name, encrypted.iv, encrypted.key);
-    await dropbox.upload(this.dbx, blob, encryptedFileName);
+    let file = files[0];
+    let {iv, jwk, encrypted, key} = await utils.encrypt(await utils.bufferFromBlob(file));
+
+    let encryptedFileName = await utils.encryptedFileName(file.name, iv, key);
+    await dropbox.upload(this.dbx, new Blob([encrypted]), encryptedFileName);
+
     let {url: shareLink} = await dropbox.getSharedLink(this.dbx, encryptedFileName);
     let linkId = await utils.sha256(encryptedFileName);
-    await this.setState({linkId: linkId, key: encrypted.jwk})
-    sessionStorage.setItem(linkId, JSON.stringify({iv: Array.from(encrypted.iv), fileName: encryptedFileName, link: shareLink}))
+
+    await this.setState({linkId: linkId, key: jwk})
+    sessionStorage.setItem(linkId, JSON.stringify({iv: Array.from(iv), fileName: encryptedFileName, link: shareLink}))
   };
 
   render() {

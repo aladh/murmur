@@ -17,8 +17,7 @@ export default class DownloadPage extends React.Component {
   downloadFile = async () => {
     let data = await dropbox.download(this.fileData.link);
     let decrypted = await utils.decrypt(await utils.bufferFromBlob(data), await this.getKey(), this.fileData.iv);
-    let decryptedBlob = new Blob([decrypted]);
-    utils.saveToDisk(decryptedBlob, `decrypted ${this.decryptedFileName}`)
+    utils.saveToDisk(new Blob([decrypted]), `decrypted ${this.decryptedFileName}`)
   }
 
   async componentDidMount() {
