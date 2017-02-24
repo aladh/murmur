@@ -1,14 +1,9 @@
 import React from 'react';
 import utils from './utils';
+import dropbox from './dropbox';
 
 export default class DownloadPage extends React.Component {
   state = {fileName: ''};
-
-  async downloadFromDropbox(shareLink) {
-    let coreLink = shareLink.match(/\/s\/(.*)\?/)[1];
-    let response = await fetch(`https://dl.dropboxusercontent.com/1/view/${coreLink}`);
-    return await response.blob()
-  }
 
   linkId() {
     return location.pathname.slice(3)
@@ -20,7 +15,7 @@ export default class DownloadPage extends React.Component {
   }
 
   downloadFile = async () => {
-    let data = await this.downloadFromDropbox(this.fileData.link);
+    let data = await dropbox.download(this.fileData.link);
     let decrypted = await utils.decrypt(await utils.bufferFromBlob(data), await this.getKey(), this.fileData.iv);
     let decryptedBlob = new Blob([decrypted]);
     utils.saveToDisk(decryptedBlob, `decrypted ${this.decryptedFileName}`)
