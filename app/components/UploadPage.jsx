@@ -7,6 +7,21 @@ export default class UploadPage extends React.Component {
   dbx = new Dropbox({accessToken: this.props.dropboxAccessToken});
   state = {linkId: '', key: ''};
 
+  putItem(id, iv, fileName, link) {
+    let item = {
+      id: {S: id},
+      iv: {B: iv},
+      fileName: {S: fileName},
+      link: {S: link}
+    };
+
+    return new Promise((resolve, reject) => {
+      this.props.shares.putItem({Item: item}, (err, data) =>  {
+        err ? reject(err) : resolve(data)
+      })
+    })
+  }
+
   uploadFile = async ({target: {files}}) => {
     let file = files[0];
     let {iv, jwk, encrypted, key} = await utils.encrypt(await utils.bufferFromBlob(file));
@@ -17,8 +32,8 @@ export default class UploadPage extends React.Component {
     let {url: shareLink} = await dropbox.getSharedLink(this.dbx, encryptedFileName);
     let linkId = await utils.sha256(encryptedFileName);
 
-    await this.setState({linkId: linkId, key: jwk})
-    sessionStorage.setItem(linkId, JSON.stringify({iv: Array.from(iv), fileName: encryptedFileName, link: shareLink}))
+    await this.putItem(linkId, iv, encryptedFileName, shareLink)
+    this.setState({linkId: linkId, key: jwk})
   };
 
   render() {

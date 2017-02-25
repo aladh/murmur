@@ -6,7 +6,6 @@ export default class AuthPage extends React.Component {
   dbx = new Dropbox({clientId: secrets.dropboxClientId});
   state = {authUrl: ''}
 
-
   componentDidMount() {
     this.setState({authUrl: this.dbx.getAuthenticationUrl('http://localhost:3333/')})
   }

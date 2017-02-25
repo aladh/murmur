@@ -10,6 +10,7 @@
     "build": "brunch build --production"
   },
   "dependencies": {
+    "aws-sdk": "^2.20.0",
     "babel-plugin-syntax-async-functions": "^6.13.0",
     "dropbox": "^2.5.1",
     "hi-base32": "^0.2.0",
