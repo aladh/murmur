@@ -1,6 +1,5 @@
 import React from 'react';
 import utils from './utils';
-import dropbox from './dropbox';
 
 export default class DownloadPage extends React.Component {
   static contextTypes = {
@@ -19,7 +18,7 @@ export default class DownloadPage extends React.Component {
   }
 
   downloadFile = async () => {
-    let data = await dropbox.download(this.fileData.link);
+    let data = await utils.dropbox.download(this.fileData.link);
     let decrypted = await utils.decrypt(await utils.bufferFromBlob(data), await this.getKey(), this.fileData.iv);
     utils.saveToDisk(new Blob([decrypted]), `decrypted ${this.decryptedFileName}`)
   }

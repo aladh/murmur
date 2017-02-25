@@ -1,4 +1,5 @@
 import base32 from 'hi-base32';
+import dropbox from './dropbox';
 
 const bufferFromBlob = async function(blob) {
   let reader = new FileReader();
@@ -70,4 +71,4 @@ const saveToDisk = async function(blob, fileName) {
 };
 
 export default {bufferFromBlob, encrypt, encryptedFileName, sha256, importKey,
-                decrypt, decryptedFileName, saveToDisk};
+                decrypt, decryptedFileName, saveToDisk, dropbox};

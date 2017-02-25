@@ -1,7 +1,6 @@
 import React from 'react';
 import Dropbox from 'dropbox';
 import utils from './utils';
-import dropbox from './dropbox';
 
 export default class UploadPage extends React.Component {
   static contextTypes = {
@@ -17,9 +16,9 @@ export default class UploadPage extends React.Component {
     let {iv, jwk, encrypted, key} = await utils.encrypt(await utils.bufferFromBlob(file));
 
     let encryptedFileName = await utils.encryptedFileName(file.name, iv, key);
-    await dropbox.upload(this.dbx, new Blob([encrypted]), encryptedFileName);
+    await utils.dropbox.upload(this.dbx, new Blob([encrypted]), encryptedFileName);
 
-    let {url: shareLink} = await dropbox.getSharedLink(this.dbx, encryptedFileName);
+    let {url: shareLink} = await utils.dropbox.getSharedLink(this.dbx, encryptedFileName);
     let linkId = await utils.sha256(encryptedFileName);
 
     await this.context.sharesTable.putItem(linkId, iv, encryptedFileName, shareLink);
