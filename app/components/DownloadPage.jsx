@@ -6,7 +6,7 @@ export default class DownloadPage extends React.Component {
     sharesTable: React.PropTypes.object.isRequired
   };
 
-  state = {fileName: ''};
+  state = {loading: true};
 
   linkId() {
     return location.pathname.slice(3)
@@ -24,17 +24,39 @@ export default class DownloadPage extends React.Component {
   }
 
   async componentDidMount() {
-    this.fileData = await this.context.sharesTable.getItem(this.linkId());
-    this.decryptedFileName = await utils.decryptedFileName(this.fileData.fileName, this.fileData.iv, await this.getKey());
-    this.setState({fileName: this.decryptedFileName})
+    try {
+      this.fileData = await this.context.sharesTable.getItem(this.linkId());
+      this.decryptedFileName = await utils.decryptedFileName(this.fileData.fileName, this.fileData.iv, await this.getKey());
+      this.setState({fileName: this.decryptedFileName, loading: false})
+    } catch(e) {
+      if(e == 'DynamoDB: Item not found') {
+        this.setState({loading: false})
+      } else {
+        throw(e)
+      }
+    }
+  }
+
+  renderDownloadButton() {
+    if(this.state.fileName) {
+      return (
+        <div>
+          <div>{this.state.fileName}</div>
+          <button onClick={this.downloadFile}>Download</button>
+        </div>
+      )
+    } else {
+      return <div>The file you are looking for no longer exists</div>
+    }
   }
 
   render() {
     return (
-      <div>
+      <div className='download-page'>
         <h3>Download File</h3>
-        <div>{this.state.fileName}</div>
-        <button onClick={this.downloadFile}>Download</button>
+        <div className={`download-section ${this.state.loading ? 'hidden' : ''}`}>
+          {this.renderDownloadButton()}
+        </div>
       </div>
     )
   }

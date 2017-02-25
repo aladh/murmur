@@ -2,4 +2,17 @@ body {
   max-width: 500px;
   margin: 0 auto;
   padding: 0 25px;
+
+  .download-page {
+    .download-section {
+      transition: opacity .5s linear;
+      visibility: visible;
+      opacity: 1;
+
+      &.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+  }
 }

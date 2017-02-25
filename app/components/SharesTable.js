@@ -30,7 +30,13 @@ export default class SharesTable {
   getItem(id) {
     return new Promise((resolve, reject) => {
       this.client.getItem({Key: {id: {S: id}}}, (err, data) => {
-        data ? resolve(this.parseItem(data)) : reject(err)
+        if(err) {
+          reject(err)
+        } else if(Object.keys(data).length > 0) {
+          resolve(this.parseItem(data))
+        } else {
+          reject('DynamoDB: Item not found')
+        }
       })
     })
   }
