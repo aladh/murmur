@@ -11,8 +11,13 @@ export default class AuthPage extends React.Component {
   }
 
   render() {
-    return <a href={this.state.authUrl}>
-      Auth
-    </a>
+    return (
+      <div>
+        <h3>Choose a provider</h3>
+        <a href={this.state.authUrl}>
+          Authenticate with Dropbox
+        </a>
+      </div>
+    )
   }
 }

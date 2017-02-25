@@ -32,6 +32,7 @@ export default class DownloadPage extends React.Component {
   render() {
     return (
       <div>
+        <h3>Download File</h3>
         <div>{this.state.fileName}</div>
         <button onClick={this.downloadFile}>Download</button>
       </div>

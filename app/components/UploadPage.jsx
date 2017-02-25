@@ -25,13 +25,25 @@ export default class UploadPage extends React.Component {
     this.setState({linkId: linkId, key: jwk})
   };
 
+  renderShareLink() {
+    if(this.state.linkId) {
+      return (
+        <span>
+          Your share link is:
+          <input value={`http://localhost:3333/s/${this.state.linkId}#${this.state.key}`} onClick={e => e.target.select()} readOnly />
+        </span>
+      )
+    }
+  }
+
   render() {
     return (
       <div>
+        <h3>Upload a file</h3>
         <span>Select a file to upload:</span>
         <input type='file' onChange={this.uploadFile}/>
         <div />
-        <span>{`Your share link is: http://localhost:3333/s/${this.state.linkId}#${this.state.key}`}</span>
+        {this.renderShareLink()}
       </div>
     );
   }
