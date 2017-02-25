@@ -2,31 +2,40 @@ import React from 'react';
 import UploadPage from './UploadPage';
 import DownloadPage from './DownloadPage';
 import AuthPage from './AuthPage';
-import DynamoDB from 'aws-sdk/clients/dynamodb';
-import secrets from '../secrets';
+import SharesTable from './SharesTable';
 
 export default class App extends React.Component {
-  shares = new DynamoDB({apiVersion: '2012-08-10',
-                           params: {TableName: 'shares'},
-                           region: 'us-east-1',
-                           credentials: {accessKeyId: secrets.awsAccessKeyId,
-                                         secretAccessKey: secrets.awsSecretAccessKey}
-                         });
+  static childContextTypes = {
+    sharesTable: React.PropTypes.object.isRequired,
+    dropboxAccessToken: React.PropTypes.string
+  };
 
-  componentWillMount() {
-    if(location.hash.includes('access_token')) {
-      sessionStorage.setItem('dropboxAccessToken', location.hash.match(/#access_token=(\w*)&/)[1])
-    }
-  }
+  dropboxAccessToken: '';
+  sharesTable = new SharesTable();
 
   renderPage() {
     if(location.pathname.length > 1) {
-      return <DownloadPage shares={this.shares} />
-    } else if(!sessionStorage.getItem('dropboxAccessToken')) {
+      return <DownloadPage />
+    } else if(!this.authenticated()) {
       return <AuthPage />
     } else {
-      return <UploadPage dropboxAccessToken={sessionStorage.getItem('dropboxAccessToken')} shares={this.shares} />
+      return <UploadPage />
     }
+  }
+
+  authenticated() {
+    return location.hash.includes('access_token')
+  }
+
+  getChildContext() {
+    return {
+      sharesTable: this.sharesTable,
+      dropboxAccessToken: this.dropboxAccessToken
+    }
+  }
+
+  componentWillMount() {
+    if(this.authenticated()) this.dropboxAccessToken = location.hash.match(/#access_token=(([^&])*)&/)[1]
   }
 
   render() {
