@@ -59,7 +59,7 @@ const decryptedFileName = async function(encryptedFileName, iv, key) {
   return new TextDecoder().decode(decryptedBuffer)
 };
 
-const saveToDisk = async function(blob, fileName) {
+const saveToDisk = function(blob, fileName) {
   let url = window.URL.createObjectURL(blob);
   let a = document.createElement("a");
   document.body.appendChild(a);
