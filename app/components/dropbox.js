@@ -12,10 +12,10 @@ const upload = async function(client, blob, fileName) {
   return response
 };
 
-const getSharedLink = async function(client, fileName) {
-  return await client.sharingCreateSharedLinkWithSettings({
+const deleteFile = async function(client, fileName) {
+  return await client.filesDelete({
       path: `/${fileName}`
   })
 };
 
-export default {download, upload, getSharedLink};
+export default {download, upload, deleteFile};
