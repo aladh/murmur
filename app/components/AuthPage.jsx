@@ -7,7 +7,7 @@ export default class AuthPage extends React.Component {
   state = {authUrl: ''}
 
   componentDidMount() {
-    this.setState({authUrl: this.dbx.getAuthenticationUrl('http://localhost:3333/')})
+    this.setState({authUrl: this.dbx.getAuthenticationUrl('https://biimer.com/')})
   }
 
   render() {
