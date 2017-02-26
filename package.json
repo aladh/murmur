@@ -28,6 +28,7 @@
     "babel-preset-stage-0": "^6.22.0",
     "brunch": "^2",
     "clean-css-brunch": "^2",
+    "digest-brunch": "^1.6.0",
     "sass-brunch": "^2.10.4",
     "uglify-js-brunch": "^2"
   }
