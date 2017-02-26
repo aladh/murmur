@@ -41,6 +41,14 @@ export default class SharesTable {
     })
   }
 
+  deleteItem(id) {
+    return new Promise((resolve, reject) => {
+      this.client.deleteItem({Key: {id: {S: id}}}, (err, data) => {
+        err ? reject(err) : resolve(data)
+      })
+    })
+  }
+
   parseItem({Item: item}) {
     let o = {};
 

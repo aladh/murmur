@@ -18,11 +18,16 @@ export default class DownloadPage extends React.Component {
     return this.key
   }
 
+  async deleteFile(dropboxClient) {
+    await utils.dropbox.deleteFile(dropboxClient, this.fileData.fileName);
+    await this.context.sharesTable.deleteItem(this.fileData.id)
+  }
+
   downloadFile = async () => {
     let dropboxClient = new Dropbox({accessToken: this.fileData.accessToken})
     let {fileBlob} = await utils.dropbox.download(dropboxClient, this.fileData.fileName);
     let decrypted = await utils.decrypt(await utils.bufferFromBlob(fileBlob), await this.getKey(), this.fileData.iv);
-    utils.dropbox.deleteFile(dropboxClient, this.fileData.fileName);
+    this.deleteFile(dropboxClient);
     utils.saveToDisk(new Blob([decrypted]), `decrypted ${this.decryptedFileName}`)
   }
 
