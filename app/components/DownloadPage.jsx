@@ -31,7 +31,7 @@ export default class DownloadPage extends React.Component {
     this.setState({status: 'Decrypting'});
     let decrypted = await utils.decrypt(await utils.bufferFromBlob(fileBlob), await this.getKey(), this.fileData.iv);
     this.deleteFile(dropboxClient);
-    utils.saveToDisk(new Blob([decrypted]), `decrypted ${this.decryptedFileName}`);
+    utils.saveToDisk(new Blob([decrypted]), this.decryptedFileName);
     this.setState({downloaded: true, status: 'Done!'})
   }
 
