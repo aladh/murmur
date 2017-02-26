@@ -12,12 +12,12 @@ export default class SharesTable {
     }
   });
 
-  putItem(id, iv, fileName, link) {
+  putItem(id, iv, fileName, accessToken) {
     let item = {
       id: {S: id},
       iv: {B: iv},
       fileName: {S: fileName},
-      link: {S: link}
+      accessToken: {S: accessToken}
     };
 
     return new Promise((resolve, reject) => {

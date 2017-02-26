@@ -1,7 +1,7 @@
-const download = async function(shareLink) {
-  let coreLink = shareLink.match(/\/s\/(.*)\?/)[1];
-  let response = await fetch(`https://dl.dropboxusercontent.com/1/view/${coreLink}`);
-  return await response.blob()
+const download = async function(client, fileName) {
+  return await client.filesDownload({
+      path: `/${fileName}`
+  })
 };
 
 const upload = async function(client, blob, fileName) {

@@ -8,7 +8,6 @@ export default class UploadPage extends React.Component {
     dropboxAccessToken: React.PropTypes.string.isRequired
   };
 
-  dbx = new Dropbox({accessToken: this.context.dropboxAccessToken});
   state = {linkId: '', key: ''};
 
   uploadFile = async ({target: {files}}) => {
@@ -16,12 +15,11 @@ export default class UploadPage extends React.Component {
     let {iv, jwk, encrypted, key} = await utils.encrypt(await utils.bufferFromBlob(file));
 
     let encryptedFileName = await utils.encryptedFileName(file.name, iv, key);
-    await utils.dropbox.upload(this.dbx, new Blob([encrypted]), encryptedFileName);
+    await utils.dropbox.upload(new Dropbox({accessToken: this.context.dropboxAccessToken}), new Blob([encrypted]), encryptedFileName);
 
-    let {url: shareLink} = await utils.dropbox.getSharedLink(this.dbx, encryptedFileName);
     let linkId = await utils.sha256(encryptedFileName);
 
-    await this.context.sharesTable.putItem(linkId, iv, encryptedFileName, shareLink);
+    await this.context.sharesTable.putItem(linkId, iv, encryptedFileName, this.context.dropboxAccessToken);
     this.setState({linkId: linkId, key: jwk})
   };
 
