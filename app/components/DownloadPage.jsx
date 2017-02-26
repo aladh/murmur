@@ -1,13 +1,14 @@
 import React from 'react';
 import Dropbox from 'dropbox';
 import utils from './utils';
+import Status from './Status';
 
 export default class DownloadPage extends React.Component {
   static contextTypes = {
     sharesTable: React.PropTypes.object.isRequired
   };
 
-  state = {loading: true, downloaded: false};
+  state = {loading: true, downloaded: false, status: ''};
 
   linkId() {
     return location.pathname.slice(3)
@@ -25,11 +26,13 @@ export default class DownloadPage extends React.Component {
 
   downloadFile = async () => {
     let dropboxClient = new Dropbox({accessToken: this.fileData.accessToken})
+    this.setState({status: 'Downloading'});
     let {fileBlob} = await utils.dropbox.download(dropboxClient, this.fileData.fileName);
+    this.setState({status: 'Decrypting'});
     let decrypted = await utils.decrypt(await utils.bufferFromBlob(fileBlob), await this.getKey(), this.fileData.iv);
     this.deleteFile(dropboxClient);
-    utils.saveToDisk(new Blob([decrypted]), `decrypted ${this.decryptedFileName}`)
-    this.setState({downloaded: true})
+    utils.saveToDisk(new Blob([decrypted]), `decrypted ${this.decryptedFileName}`);
+    this.setState({downloaded: true, status: 'Done!'})
   }
 
   async componentDidMount() {
@@ -72,6 +75,8 @@ export default class DownloadPage extends React.Component {
         <div className={`download-section ${this.state.loading ? 'hidden' : ''}`}>
           {this.renderDownloadSection()}
         </div>
+        <div />
+        <Status message={this.state.status} />
       </div>
     )
   }
