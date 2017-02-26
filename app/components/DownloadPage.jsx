@@ -7,7 +7,7 @@ export default class DownloadPage extends React.Component {
     sharesTable: React.PropTypes.object.isRequired
   };
 
-  state = {loading: true};
+  state = {loading: true, downloaded: false};
 
   linkId() {
     return location.pathname.slice(3)
@@ -29,6 +29,7 @@ export default class DownloadPage extends React.Component {
     let decrypted = await utils.decrypt(await utils.bufferFromBlob(fileBlob), await this.getKey(), this.fileData.iv);
     this.deleteFile(dropboxClient);
     utils.saveToDisk(new Blob([decrypted]), `decrypted ${this.decryptedFileName}`)
+    this.setState({downloaded: true})
   }
 
   async componentDidMount() {
@@ -46,11 +47,17 @@ export default class DownloadPage extends React.Component {
   }
 
   renderDownloadButton() {
+    if(!this.state.downloaded) {
+      return <button onClick={this.downloadFile}>Download</button>
+    }
+  }
+
+  renderDownloadSection() {
     if(this.state.fileName) {
       return (
         <div>
           <div>{this.state.fileName}</div>
-          <button onClick={this.downloadFile}>Download</button>
+          {this.renderDownloadButton()}
         </div>
       )
     } else {
@@ -63,7 +70,7 @@ export default class DownloadPage extends React.Component {
       <div className='download-page'>
         <h3>Download File</h3>
         <div className={`download-section ${this.state.loading ? 'hidden' : ''}`}>
-          {this.renderDownloadButton()}
+          {this.renderDownloadSection()}
         </div>
       </div>
     )
