@@ -31,7 +31,7 @@ export default class UploadPage extends React.Component {
       return (
         <span>
           Your share link is:
-          <input value={`https://biimer.com/s/${this.state.linkId}#${this.state.key}`} onClick={e => e.target.select()} readOnly />
+          <input value={`${utils.baseURL()}s/${this.state.linkId}#${this.state.key}`} onClick={e => e.target.select()} readOnly />
         </span>
       )
     }

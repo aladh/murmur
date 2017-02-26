@@ -70,5 +70,9 @@ const saveToDisk = function(blob, fileName) {
   window.URL.revokeObjectURL(url);
 };
 
+const baseURL = function() {
+  return window.location.hostname == 'localhost' ? 'http://localhost:3333/' : 'https://biimer.com/'
+};
+
 export default {bufferFromBlob, encrypt, encryptedFileName, sha256, importKey,
-                decrypt, decryptedFileName, saveToDisk, dropbox};
+                decrypt, decryptedFileName, saveToDisk, dropbox, baseURL};
