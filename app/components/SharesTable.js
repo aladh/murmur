@@ -17,7 +17,9 @@ export default class SharesTable {
       id: {S: id},
       iv: {B: iv},
       fileName: {S: fileName},
-      accessToken: {S: accessToken}
+      accessToken: {S: accessToken},
+      createdAt: {N: Date.now().toString()},
+      provider: {S: 'dropbox'}
     };
 
     return new Promise((resolve, reject) => {
