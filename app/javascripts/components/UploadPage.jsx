@@ -1,6 +1,6 @@
 import React from 'react';
 import Dropbox from 'dropbox';
-import utils from './utils';
+import utils from '../utils';
 import Status from './Status';
 
 export default class UploadPage extends React.Component {

@@ -1,7 +1,7 @@
 import React from 'react';
 import Dropbox from 'dropbox';
-import secrets from '../secrets';
-import utils from './utils';
+import secrets from '../../secrets';
+import utils from '../utils';
 
 export default class AuthPage extends React.Component {
   dbx = new Dropbox({clientId: secrets.dropboxClientId});

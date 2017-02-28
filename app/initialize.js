@@ -1,7 +1,7 @@
 import "babel-polyfill";
 import ReactDOM from 'react-dom';
 import React from 'react';
-import App from 'components/App';
+import App from 'javascripts/components/App';
 import secrets from './secrets';
 
 window.gaTrackingId = secrets.gaTrackingId;

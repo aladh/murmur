@@ -2,7 +2,7 @@ import React from 'react';
 import UploadPage from './UploadPage';
 import DownloadPage from './DownloadPage';
 import AuthPage from './AuthPage';
-import SharesTable from './SharesTable';
+import SharesTable from '../SharesTable';
 
 export default class App extends React.Component {
   static childContextTypes = {
