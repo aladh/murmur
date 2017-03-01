@@ -5,6 +5,8 @@ const sharesTable = require('resources/SharesTable');
 exports.handler = (event, context, callback) => {
 	sharesTable.getItem(event.pathParameters.id)
 		.then((item) => {
+			item.iv = Array.from(item.iv);
+			
 	    context.succeed({
 	      "statusCode": 200,
 		    "headers": {},
