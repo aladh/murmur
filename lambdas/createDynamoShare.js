@@ -15,14 +15,14 @@ exports.handler = (event, context, callback) => {
 		.then(() => {
 	    context.succeed({
 	      "statusCode": 200,
-		    "headers": {},
+		    "headers": {'Access-Control-Allow-Origin': 'https://biimer.com'},
 	      "body": "" 
 	    })
 		})
 		.catch(err => {
 	    context.succeed({
 	      "statusCode": 500,
-	      "headers": {},
+	      "headers": {'Access-Control-Allow-Origin': 'https://biimer.com'},
 	      "body": ""
 	    })
 		})
