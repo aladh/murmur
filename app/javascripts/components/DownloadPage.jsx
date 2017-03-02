@@ -4,10 +4,6 @@ import utils from '../utils';
 import Status from './Status';
 
 export default class DownloadPage extends React.Component {
-  static contextTypes = {
-    sharesTable: React.PropTypes.object.isRequired
-  };
-
   state = {loading: true, downloaded: false, status: ''};
 
   linkId() {
@@ -21,7 +17,7 @@ export default class DownloadPage extends React.Component {
 
   async deleteFile(dropboxClient) {
     await utils.dropbox.deleteFile(dropboxClient, this.fileData.fileName);
-    await this.context.sharesTable.deleteItem(this.fileData.id)
+    await fetch(`https://api.biimer.com/shares/${this.fileData.id}`, {method: 'DELETE'});
   }
 
   downloadFile = async () => {
@@ -33,20 +29,20 @@ export default class DownloadPage extends React.Component {
     this.deleteFile(dropboxClient);
     utils.saveToDisk(new Blob([decrypted]), this.decryptedFileName);
     this.setState({downloaded: true, status: 'Done!'})
+  };
+
+  async loadFileData() {
+    let response = await fetch(`https://api.biimer.com/shares/${this.linkId()}`);
+    if (response.status != 200) return null;
+    let fileData = await response.json();
+    return {...fileData, iv: new Uint8Array(fileData.iv)}
   }
 
   async componentDidMount() {
-    try {
-      this.fileData = await this.context.sharesTable.getItem(this.linkId());
-      this.decryptedFileName = await utils.decryptedFileName(this.fileData.fileName, this.fileData.iv, await this.getKey());
-      this.setState({fileName: this.decryptedFileName, loading: false})
-    } catch(e) {
-      if(e == 'DynamoDB: Item not found') {
-        this.setState({loading: false})
-      } else {
-        throw(e)
-      }
-    }
+    this.fileData = await this.loadFileData();
+    if (!this.fileData) return this.setState({loading: false});
+    this.decryptedFileName = await utils.decryptedFileName(this.fileData.fileName, this.fileData.iv, await this.getKey());
+    this.setState({fileName: this.decryptedFileName, loading: false})
   }
 
   renderDownloadButton() {

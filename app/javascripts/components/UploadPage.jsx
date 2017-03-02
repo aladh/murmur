@@ -5,7 +5,6 @@ import Status from './Status';
 
 export default class UploadPage extends React.Component {
   static contextTypes = {
-    sharesTable: React.PropTypes.object.isRequired,
     dropboxAccessToken: React.PropTypes.string.isRequired
   };
 
@@ -22,7 +21,11 @@ export default class UploadPage extends React.Component {
 
     let linkId = await utils.sha256(encryptedFileName);
 
-    await this.context.sharesTable.putItem(linkId, iv, encryptedFileName, this.context.dropboxAccessToken);
+    await fetch('https://api.biimer.com/shares/', {
+      method: 'POST',
+      body: JSON.stringify({id: linkId, iv: Array.from(iv), fileName: encryptedFileName, accessToken: this.context.dropboxAccessToken})
+    });
+
     this.setState({linkId: linkId, key: jwk, status: 'Done!'})
   };
 

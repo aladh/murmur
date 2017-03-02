@@ -2,16 +2,13 @@ import React from 'react';
 import UploadPage from './UploadPage';
 import DownloadPage from './DownloadPage';
 import AuthPage from './AuthPage';
-import SharesTable from '../SharesTable';
 
 export default class App extends React.Component {
   static childContextTypes = {
-    sharesTable: React.PropTypes.object.isRequired,
     dropboxAccessToken: React.PropTypes.string
   };
 
   dropboxAccessToken: '';
-  sharesTable = new SharesTable();
 
   renderPage() {
     if(location.pathname.length > 1) {
@@ -29,7 +26,6 @@ export default class App extends React.Component {
 
   getChildContext() {
     return {
-      sharesTable: this.sharesTable,
       dropboxAccessToken: this.dropboxAccessToken
     }
   }
