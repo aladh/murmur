@@ -23,7 +23,7 @@ exports.handler = (event, context, callback) => {
 	    context.succeed({
 	      "statusCode": 500,
 	      "headers": {'Access-Control-Allow-Origin': 'https://biimer.com'},
-	      "body": ""
+	      "body": JSON.stringify(err)
 	    })
 		})
 };

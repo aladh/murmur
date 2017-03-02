@@ -17,7 +17,7 @@ exports.handler = (event, context, callback) => {
 	    context.succeed({
 	      "statusCode": err == 'DynamoDB: Item not found' ? 404 : 500,
 	      "headers": {'Access-Control-Allow-Origin': 'https://biimer.com'},
-	      "body": ""
+	      "body": JSON.stringify(err)
 	    })
 		})
 };
