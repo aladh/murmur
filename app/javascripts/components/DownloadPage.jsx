@@ -2,6 +2,7 @@ import React from 'react';
 import Dropbox from 'dropbox';
 import utils from '../utils';
 import Status from './Status';
+import secrets from '../../secrets';
 
 export default class DownloadPage extends React.Component {
   state = {loading: true, downloaded: false, status: ''};
@@ -17,7 +18,10 @@ export default class DownloadPage extends React.Component {
 
   async deleteFile(dropboxClient) {
     await utils.dropbox.deleteFile(dropboxClient, this.fileData.fileName);
-    await fetch(`https://api.biimer.com/shares/${this.fileData.id}`, {method: 'DELETE'});
+    await fetch(`https://api.biimer.com/shares/${this.fileData.id}`, {
+      method: 'DELETE',
+      headers: {'x-api-key': secrets.apiKey}
+    });
   }
 
   downloadFile = async () => {
@@ -32,7 +36,9 @@ export default class DownloadPage extends React.Component {
   };
 
   async loadFileData() {
-    let response = await fetch(`https://api.biimer.com/shares/${this.linkId()}`);
+    let response = await fetch(`https://api.biimer.com/shares/${this.linkId()}`, {
+      headers: {'x-api-key': secrets.apiKey}
+    });
     if (response.status != 200) return null;
     let fileData = await response.json();
     return {...fileData, iv: new Uint8Array(fileData.iv)}

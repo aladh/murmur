@@ -2,6 +2,7 @@ import React from 'react';
 import Dropbox from 'dropbox';
 import utils from '../utils';
 import Status from './Status';
+import secrets from '../../secrets';
 
 export default class UploadPage extends React.Component {
   static contextTypes = {
@@ -22,6 +23,7 @@ export default class UploadPage extends React.Component {
     let linkId = await utils.sha256(encryptedFileName);
 
     await fetch('https://api.biimer.com/shares/', {
+      headers: {'x-api-key': secrets.apiKey},
       method: 'POST',
       body: JSON.stringify({id: linkId, iv: Array.from(iv), fileName: encryptedFileName, accessToken: this.context.dropboxAccessToken})
     });
