@@ -1,7 +1,7 @@
 'use strict';
 
 const DynamoDB = require('aws-sdk/clients/dynamodb');
-const secrets =  require('./secrets');
+const secrets = require('./secrets');
 
 class SharesTable {
   constructor() {
@@ -40,9 +40,10 @@ class SharesTable {
         if(err) {
           reject(err)
         } else if(Object.keys(data).length > 0) {
-          resolve(this.parseItem(data))
+          let item = this.parseItem(data);
+          this.expired(item) ? reject({message: 'SharesTable: Item has expired'}) : resolve(item)
         } else {
-          reject('DynamoDB: Item not found')
+          reject({message: 'SharesTable: Item not found'})
         }
       })
     })
@@ -57,6 +58,10 @@ class SharesTable {
   }
 
   // PRIVATE
+
+  expired(item) {
+    return this.unixTime() > item.expireAt
+  }
 
   parseItem(data) {
     let o = {};
