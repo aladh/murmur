@@ -42,7 +42,7 @@ class SharesTable {
           reject(err)
         } else if(Object.keys(data).length > 0) {
           let item = this.parseItem(data);
-          this.expired(item) ? reject({message: 'SharesTable: Item has expired'}) : resolve(item)
+          this.expired(item) ? reject({message: 'SharesTable: Item has expired'}) : resolve(this.filterPublicAttributes(item))
         } else {
           reject({message: 'SharesTable: Item not found'})
         }
@@ -59,6 +59,15 @@ class SharesTable {
   }
 
   // PRIVATE
+
+  filterPublicAttributes(item) {
+    return {
+      id: item.id,
+      iv: item.iv,
+      fileName: item.fileName,
+      shareLink: item.shareLink,
+    }
+  }
 
   expired(item) {
     return this.unixTime() > item.expireAt
