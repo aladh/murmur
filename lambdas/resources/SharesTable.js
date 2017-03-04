@@ -22,7 +22,7 @@ class SharesTable {
       iv: {B: iv},
       fileName: {S: fileName},
       accessToken: {S: accessToken},
-      createdAt: {N: Date.now().toString()},
+      createdAt: {N: this.unixTime()},
       provider: {S: 'dropbox'}
     };
 
@@ -66,6 +66,10 @@ class SharesTable {
     });
 
     return o;
+  }
+
+  unixTime() {
+    return Math.floor(Date.now() / 1000)
   }
 }
 
