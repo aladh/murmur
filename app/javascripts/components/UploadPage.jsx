@@ -1,5 +1,4 @@
 import React from 'react';
-import Dropbox from 'dropbox';
 import utils from '../utils';
 import Status from './Status';
 import secrets from '../../secrets';
@@ -18,7 +17,7 @@ export default class UploadPage extends React.Component {
 
     let encryptedFileName = await utils.encryptedFileName(file.name, iv, key);
     this.setState({status: 'Uploading'});
-    await utils.dropbox.upload(new Dropbox({accessToken: this.context.dropboxAccessToken}), new Blob([encrypted]), encryptedFileName);
+    await utils.dropbox.upload(this.context.dropboxAccessToken, new Blob([encrypted]), encryptedFileName);
 
     let linkId = await utils.sha256(encryptedFileName);
 

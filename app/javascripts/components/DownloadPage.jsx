@@ -1,5 +1,4 @@
 import React from 'react';
-import Dropbox from 'dropbox';
 import utils from '../utils';
 import Status from './Status';
 import secrets from '../../secrets';
@@ -16,8 +15,8 @@ export default class DownloadPage extends React.Component {
     return this.key
   }
 
-  async deleteFile(dropboxClient) {
-    await utils.dropbox.deleteFile(dropboxClient, this.fileData.fileName);
+  async deleteFile(accessToken) {
+    await utils.dropbox.deleteFile(accessToken, this.fileData.fileName);
     await fetch(`https://api.biimer.com/shares/${this.fileData.id}`, {
       method: 'DELETE',
       headers: {'x-api-key': secrets.apiKey}
@@ -25,12 +24,11 @@ export default class DownloadPage extends React.Component {
   }
 
   downloadFile = async () => {
-    let dropboxClient = new Dropbox({accessToken: this.fileData.accessToken})
     this.setState({status: 'Downloading'});
-    let {fileBlob} = await utils.dropbox.download(dropboxClient, this.fileData.fileName);
+    let {fileBlob} = await utils.dropbox.download(this.fileData.accessToken, this.fileData.fileName);
     this.setState({status: 'Decrypting'});
     let decrypted = await utils.decrypt(await utils.bufferFromBlob(fileBlob), await this.getKey(), this.fileData.iv);
-    this.deleteFile(dropboxClient);
+    this.deleteFile(this.fileData.accessToken);
     utils.saveToDisk(new Blob([decrypted]), this.decryptedFileName);
     this.setState({downloaded: true, status: 'Done!'})
   };
