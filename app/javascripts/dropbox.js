@@ -17,10 +17,4 @@ const upload = async function(accessToken, blob, fileName) {
   })
 };
 
-const deleteFile = async function(accessToken, fileName) {
-  return await client(accessToken).filesDelete({
-      path: `/${fileName}`
-  })
-};
-
-export default {download, upload, deleteFile};
+export default {download, upload};

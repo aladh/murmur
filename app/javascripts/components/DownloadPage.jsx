@@ -15,9 +15,8 @@ export default class DownloadPage extends React.Component {
     return this.key
   }
 
-  async deleteFile(accessToken) {
-    await utils.dropbox.deleteFile(accessToken, this.fileData.fileName);
-    await fetch(`https://api.biimer.com/shares/${this.fileData.id}`, {
+  deleteFile() {
+    fetch(`https://api.biimer.com/shares/${this.fileData.id}`, {
       method: 'DELETE',
       headers: {'x-api-key': secrets.apiKey}
     });
@@ -28,7 +27,7 @@ export default class DownloadPage extends React.Component {
     let {fileBlob} = await utils.dropbox.download(this.fileData.accessToken, this.fileData.fileName);
     this.setState({status: 'Decrypting'});
     let decrypted = await utils.decrypt(await utils.bufferFromBlob(fileBlob), await this.getKey(), this.fileData.iv);
-    this.deleteFile(this.fileData.accessToken);
+    this.deleteFile();
     utils.saveToDisk(new Blob([decrypted]), this.decryptedFileName);
     this.setState({downloaded: true, status: 'Done!'})
   };
