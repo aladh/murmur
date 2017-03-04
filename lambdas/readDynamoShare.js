@@ -14,10 +14,8 @@ exports.handler = (event, context, callback) => {
 	    })
 		})
 		.catch(err => {
-			let statusCode = e.message.includes('SharesTable') ? 404 : 500;
-
 	    context.succeed({
-	      "statusCode": statusCode,
+	      "statusCode": err.message.includes('SharesTable') ? 404 : 500,
 	      "headers": {'Access-Control-Allow-Origin': '*'},
 	      "body": JSON.stringify(err)
 	    })
