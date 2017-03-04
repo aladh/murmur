@@ -55,6 +55,8 @@ class SharesTable {
     })
   }
 
+  // PRIVATE
+
   parseItem(data) {
     let o = {};
     let item = data.Item;
