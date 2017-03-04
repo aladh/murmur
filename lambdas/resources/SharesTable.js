@@ -22,7 +22,8 @@ class SharesTable {
       iv: {B: iv},
       fileName: {S: fileName},
       accessToken: {S: accessToken},
-      createdAt: {N: this.unixTime()},
+      createdAt: {N: this.unixTime().toString()},
+      expireAt: {N: this.defaultExpirationTime().toString()},
       provider: {S: 'dropbox'}
     };
 
@@ -70,6 +71,11 @@ class SharesTable {
 
   unixTime() {
     return Math.floor(Date.now() / 1000)
+  }
+
+  defaultExpirationTime() {
+    // 7 days from now
+    return this.unixTime() + 604800
   }
 }
 
