@@ -16,7 +16,7 @@ class SharesTable {
     })
   }
 
-  putItem(id, iv, fileName, accessToken) {
+  putItem(id, iv, fileName, accessToken, shareLink) {
     let item = {
       id: {S: id},
       iv: {B: iv},
@@ -24,7 +24,8 @@ class SharesTable {
       accessToken: {S: accessToken},
       createdAt: {N: this.unixTime().toString()},
       expireAt: {N: this.defaultExpirationTime().toString()},
-      provider: {S: 'dropbox'}
+      provider: {S: 'dropbox'},
+      shareLink: {S: shareLink}
     };
 
     return new Promise((resolve, reject) => {

@@ -8,10 +8,11 @@ exports.handler = (event, context, callback) => {
 		id: body.id,
 		iv: new Uint8Array(body.iv),
 		fileName: body.fileName,
-		accessToken: body.accessToken
+		accessToken: body.accessToken,
+		shareLink: body.shareLink
 	};
 
-	sharesTable.putItem(item.id, item.iv, item.fileName, item.accessToken)
+	sharesTable.putItem(item.id, item.iv, item.fileName, item.accessToken, item.shareLink)
 		.then(() => {
 	    context.succeed({
 	      "statusCode": 200,

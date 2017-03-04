@@ -24,7 +24,7 @@ export default class DownloadPage extends React.Component {
 
   downloadFile = async () => {
     this.setState({status: 'Downloading'});
-    let {fileBlob} = await utils.dropbox.download(this.fileData.accessToken, this.fileData.fileName);
+    let fileBlob = await utils.dropbox.download(this.fileData.shareLink);
     this.setState({status: 'Decrypting'});
     let decrypted = await utils.decrypt(await utils.bufferFromBlob(fileBlob), await this.getKey(), this.fileData.iv);
     this.deleteFile();

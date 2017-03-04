@@ -19,12 +19,13 @@ export default class UploadPage extends React.Component {
     this.setState({status: 'Uploading'});
     await utils.dropbox.upload(this.context.dropboxAccessToken, new Blob([encrypted]), encryptedFileName);
 
+    let {url: shareLink} = await utils.dropbox.getSharedLink(this.context.dropboxAccessToken, encryptedFileName);
     let linkId = await utils.sha256(encryptedFileName);
 
     await fetch('https://api.biimer.com/shares/', {
       headers: {'x-api-key': secrets.apiKey},
       method: 'POST',
-      body: JSON.stringify({id: linkId, iv: Array.from(iv), fileName: encryptedFileName, accessToken: this.context.dropboxAccessToken})
+      body: JSON.stringify({id: linkId, iv: Array.from(iv), fileName: encryptedFileName, accessToken: this.context.dropboxAccessToken, shareLink})
     });
 
     this.setState({linkId: linkId, key: jwk, status: 'Done!'})
