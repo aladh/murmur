@@ -4,7 +4,7 @@ import Status from './Status';
 import secrets from '../../secrets';
 
 export default class UploadPage extends React.Component {
-  static contextTypes = {
+  static propTypes = {
     dropboxAccessToken: React.PropTypes.string.isRequired
   };
 
@@ -17,15 +17,15 @@ export default class UploadPage extends React.Component {
 
     let encryptedFileName = await utils.encryptedFileName(file.name, iv, key);
     this.setState({status: 'Uploading'});
-    await utils.dropbox.upload(this.context.dropboxAccessToken, new Blob([encrypted]), encryptedFileName);
+    await utils.dropbox.upload(this.props.dropboxAccessToken, new Blob([encrypted]), encryptedFileName);
 
-    let {url: shareLink} = await utils.dropbox.getSharedLink(this.context.dropboxAccessToken, encryptedFileName);
+    let {url: shareLink} = await utils.dropbox.getSharedLink(this.props.dropboxAccessToken, encryptedFileName);
     let linkId = await utils.sha256(encryptedFileName);
 
     await fetch('https://api.biimer.com/shares/', {
       headers: {'x-api-key': secrets.apiKey},
       method: 'POST',
-      body: JSON.stringify({id: linkId, iv: Array.from(iv), fileName: encryptedFileName, accessToken: this.context.dropboxAccessToken, shareLink})
+      body: JSON.stringify({id: linkId, iv: Array.from(iv), fileName: encryptedFileName, accessToken: this.props.dropboxAccessToken, shareLink})
     });
 
     this.setState({linkId: linkId, key: jwk, status: 'Done!'})
