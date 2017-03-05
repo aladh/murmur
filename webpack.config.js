@@ -3,9 +3,11 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const isProduction = process.env.NODE_ENV == 'production';
 
 module.exports = {
-  entry: './client/initialize',
+  entry: {
+    client: './client/initialize'
+  },
   output: {
-    filename: isProduction ? 'bundle.[chunkhash].js' : 'bundle.js',
+    filename: isProduction ? '[name]-[chunkhash].js' : '[name].js',
     path: path.resolve(__dirname, 'dist')
   },
   module: {
