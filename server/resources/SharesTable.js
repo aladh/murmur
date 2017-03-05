@@ -1,7 +1,7 @@
 'use strict';
 
 const DynamoDB = require('aws-sdk/clients/dynamodb');
-const secrets = require('./secrets');
+const secrets = require('./../secrets');
 
 class SharesTable {
   constructor() {
