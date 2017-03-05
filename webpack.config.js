@@ -40,5 +40,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './client/assets/index.html'
     })
-  ]
+  ],
+  devServer: {
+    port: 8081,
+    historyApiFallback: true
+  }
 };
