@@ -1,5 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const isProduction = process.env.NODE_ENV == 'production';
 
 module.exports = {
   entry: './client/initialize',
@@ -35,7 +36,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      hash: true,
+      hash: isProduction,
       template: './client/assets/index.html'
     })
   ]

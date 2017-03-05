@@ -7,7 +7,7 @@
   "repository": "github:ali-l/biimer",
   "scripts": {
     "start": "webpack-dev-server",
-    "build": "webpack"
+    "build": "NODE_ENV=production webpack -p"
   },
   "dependencies": {
     "aws-sdk": "^2.20.0",
