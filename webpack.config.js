@@ -5,7 +5,7 @@ const isProduction = process.env.NODE_ENV == 'production';
 module.exports = {
   entry: './client/initialize',
   output: {
-    filename: 'bundle.js',
+    filename: isProduction ? 'bundle.[chunkhash].js' : 'bundle.js',
     path: path.resolve(__dirname, 'dist')
   },
   module: {
@@ -36,7 +36,6 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      hash: isProduction,
       template: './client/assets/index.html'
     })
   ]
