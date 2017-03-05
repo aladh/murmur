@@ -4,14 +4,15 @@ import Status from './Status';
 import secrets from '../../secrets';
 
 export default class DownloadPage extends React.Component {
+  static propTypes = {
+    shareId: React.PropTypes.string.isRequired,
+    jwk: React.PropTypes.string
+  };
+
   state = {loading: true, downloaded: false, status: ''};
 
-  linkId() {
-    return location.pathname.slice(3)
-  }
-
   async getKey() {
-    if(!this.key) this.key = await utils.importKey(location.hash.slice(1));
+    if(!this.key) this.key = await utils.importKey(this.props.jwk);
     return this.key
   }
 
@@ -33,7 +34,7 @@ export default class DownloadPage extends React.Component {
   };
 
   async loadFileData() {
-    let response = await fetch(`https://api.biimer.com/shares/${this.linkId()}`, {
+    let response = await fetch(`https://api.biimer.com/shares/${this.props.shareId}`, {
       headers: {'x-api-key': secrets.apiKey}
     });
     if (response.status != 200) return null;

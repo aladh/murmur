@@ -11,7 +11,7 @@ export default class UploadPage extends React.Component {
   state = {linkId: '', key: '', status: ''};
 
   uploadFile = async ({target: {files}}) => {
-    let file = files[0];
+    let [file] = files;
     this.setState({status: 'Encrypting'});
     let {iv, jwk, encrypted, key} = await utils.encrypt(await utils.bufferFromBlob(file));
 
@@ -32,11 +32,15 @@ export default class UploadPage extends React.Component {
   };
 
   renderShareLink() {
+    let params = new URLSearchParams();
+    params.set('share', this.state.linkId);
+    params.set('key', this.state.key);
+
     if(this.state.linkId) {
       return (
         <span>
           Your share link is:
-          <input value={`${utils.baseURL()}s/${this.state.linkId}#${this.state.key}`} onClick={e => e.target.select()} readOnly />
+          <input value={`${utils.baseURL()}#${params.toString()}`} onClick={e => e.target.select()} readOnly />
         </span>
       )
     }

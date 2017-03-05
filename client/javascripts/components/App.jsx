@@ -4,22 +4,25 @@ import DownloadPage from './DownloadPage';
 import AuthPage from './AuthPage';
 
 export default class App extends React.Component {
-  dropboxAccessToken = new URLSearchParams(location.hash.slice(1)).get('access_token');
+  params = new URLSearchParams(location.hash.slice(1));
 
-  renderPage() {
-    if(location.pathname.length > 1) {
-      return <DownloadPage />
-    } else if(!this.dropboxAccessToken) {
+  routeToPage() {
+    let dropboxAccessToken = this.params.get('access_token');
+    let shareId = this.params.get('share');
+
+    if(shareId) {
+      return <DownloadPage shareId={shareId} jwk={this.params.get('key')} />
+    } else if(!dropboxAccessToken) {
       return <AuthPage />
     } else {
-      return <UploadPage dropboxAccessToken={this.dropboxAccessToken} />
+      return <UploadPage dropboxAccessToken={dropboxAccessToken} />
     }
   }
 
   render() {
     return (
       <div id="content">
-        {this.renderPage()}
+        {this.routeToPage()}
       </div>
     );
   }
