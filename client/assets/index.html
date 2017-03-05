@@ -12,7 +12,6 @@
     <script>
       window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
       ga('create', '<%= secrets.gaTrackingId %>', 'auto');
-      if (location.hostname == 'localhost') ga('set', 'sendHitTask', null);
       ga('send', 'pageview');
     </script>
     <script async src='https://www.google-analytics.com/analytics.js'></script>
