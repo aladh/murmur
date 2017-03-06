@@ -1,5 +1,5 @@
 import DynamoDB from 'aws-sdk/clients/dynamodb';
-import secrets from './../secrets';
+import secrets from './secrets';
 
 class SharesTable {
   constructor() {
