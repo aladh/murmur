@@ -86,7 +86,8 @@ let serverConfig = {
     extensions: ['.js']
   },
   plugins: [
-    new webpack.IgnorePlugin(/vertx/)
+    new webpack.IgnorePlugin(/vertx/),
+    new webpack.DefinePlugin({ "global.GENTLY": false })
   ],
   target: 'node'
 };
