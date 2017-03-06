@@ -71,9 +71,6 @@ let serverConfig = {
             presets: [
               ['env', {
                 modules: false,
-                targets: {
-                  node: 4.3
-                }
               }],
               'stage-0'
             ]
