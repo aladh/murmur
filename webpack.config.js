@@ -15,7 +15,7 @@ let clientConfig = {
   module: {
     rules: [
       {
-        test: /client.*\.(js|jsx)$/,
+        test: /\.(js|jsx)$/,
         use: {
           loader: 'babel-loader',
           options: {
@@ -64,7 +64,7 @@ let serverConfig = {
   module: {
     rules: [
       {
-        test: /server.*\.js$/,
+        test: /\.js$/,
         use: {
           loader: 'babel-loader',
           options: {
