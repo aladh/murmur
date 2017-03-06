@@ -1,6 +1,4 @@
-'use strict';
-
-const Dropbox = require('dropbox');
+import Dropbox from 'dropbox';
 
 const client = (accessToken) => {
   return new Dropbox({accessToken})
@@ -12,4 +10,4 @@ const deleteFile = (accessToken, fileName) => {
   })
 };
 
-module.exports = deleteFile;
+export default {deleteFile}

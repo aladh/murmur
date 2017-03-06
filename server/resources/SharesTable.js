@@ -1,7 +1,5 @@
-'use strict';
-
-const DynamoDB = require('aws-sdk/clients/dynamodb');
-const secrets = require('./../secrets');
+import DynamoDB from 'aws-sdk/clients/dynamodb';
+import secrets from './../secrets';
 
 class SharesTable {
   constructor() {
@@ -94,4 +92,4 @@ class SharesTable {
   }
 }
 
-module.exports = new SharesTable();
+export default new SharesTable()

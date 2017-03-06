@@ -1,8 +1,6 @@
-'use strict';
+import sharesTable from 'resources/SharesTable';
 
-const sharesTable = require('resources/SharesTable');
-
-exports.handler = (event, context, callback) => {
+const handler = (event, context) => {
 	sharesTable.deleteItem(event.pathParameters.id)
 		.then(() => {
 	    context.succeed({
@@ -19,3 +17,5 @@ exports.handler = (event, context, callback) => {
 	    })
 		})
 };
+
+export {handler as handler}
