@@ -1,4 +1,4 @@
-import sharesTable from 'resources/SharesTable';
+import sharesTable from './resources/SharesTable';
 
 const handler = (event, context) => {
 	sharesTable.deleteItem(event.pathParameters.id)

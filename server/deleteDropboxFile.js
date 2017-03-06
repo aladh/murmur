@@ -1,4 +1,4 @@
-import deleteDropboxFile from 'resources/dropbox';
+import deleteDropboxFile from './resources/dropbox';
 
 const handler = (event, context, callback) => {
   event.Records.forEach(record => {
