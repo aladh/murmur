@@ -50,7 +50,10 @@ let clientConfig = {
 
 let serverConfig = {
   entry: {
-    createDynamoShare: './server/createDynamoShare'
+    createDynamoShare: './server/createDynamoShare',
+    readDynamoShare: './server/readDynamoShare',
+    deleteDynamoShare: './server/deleteDynamoShare',
+    deleteDropboxFile: './server/deleteDropboxFile'
   },
   output: {
     filename: '[name].js',
