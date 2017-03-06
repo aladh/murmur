@@ -23,4 +23,10 @@ const getSharedLink = async function(accessToken, fileName) {
   })
 };
 
-export default {download, upload, getSharedLink};
+const deleteFile = (accessToken, fileName) => {
+  return client(accessToken).filesDelete({
+    path: `/${fileName}`
+  })
+};
+
+export default {download, upload, getSharedLink, deleteFile};
