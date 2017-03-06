@@ -1,6 +1,6 @@
 'use strict';
 
-const sharesTable = require('resources/SharesTable');
+const sharesTable = require('./resources/SharesTable');
 
 exports.handler = (event, context, callback) => {
 	let body = JSON.parse(event.body);

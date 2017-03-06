@@ -2,13 +2,13 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const isProduction = process.env.NODE_ENV == 'production';
 
-module.exports = {
+let clientConfig = {
   entry: {
     client: './client/initialize'
   },
   output: {
     filename: isProduction ? '[name]-[chunkhash].js' : '[name].js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, isProduction ? 'dist/client' : 'dist'),
     publicPath: '/'
   },
   module: {
@@ -47,3 +47,40 @@ module.exports = {
     historyApiFallback: true
   }
 };
+
+let serverConfig = {
+  entry: {
+    createDynamoShare: './server/createDynamoShare'
+  },
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist/server')
+  },
+  module: {
+    rules: [
+      {
+        test: /server.*\.js$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              ['env', {
+                modules: false,
+                targets: {
+                  node: 4.3
+                }
+              }],
+              'stage-0'
+            ]
+          }
+        }
+      }
+    ]
+  },
+  resolve: {
+    extensions: ['.js']
+  },
+  target: 'node'
+};
+
+module.exports = [clientConfig, serverConfig];
