@@ -1,63 +1,32 @@
 import sharesTable from './sharesTable';
+import BaseController from './BaseController';
 
-class SharesController {
-  create(event, context) {
-    let item = JSON.parse(event.body);
-    item.iv = new Uint8Array(item.iv);
+class SharesController extends BaseController {
+  async create(event, context) {
+    await this.tryCatch(context, async () => {
+      let item = JSON.parse(event.body);
+      item.iv = new Uint8Array(item.iv);
 
-    sharesTable.putItem(item.id, item.iv, item.fileName, item.accessToken, item.shareLink)
-      .then(() => {
-        context.succeed({
-          "statusCode": 200,
-          "headers": {'Access-Control-Allow-Origin': '*'},
-          "body": ""
-        })
-      })
-      .catch(err => {
-        context.succeed({
-          "statusCode": 500,
-          "headers": {'Access-Control-Allow-Origin': '*'},
-          "body": JSON.stringify(err)
-        })
-      })
+      await sharesTable.putItem(item.id, item.iv, item.fileName, item.accessToken, item.shareLink);
+
+      context.succeed(this.successResponse());
+    });
   }
 
-  show(event, context) {
-    sharesTable.getItem(event.pathParameters.id)
-      .then((item) => {
-        item.iv = Array.from(item.iv);
+  async show(event, context) {
+    await this.tryCatch(context, async () => {
+      let item = await sharesTable.getItem(event.pathParameters.id);
+      item.iv = Array.from(item.iv);
 
-        context.succeed({
-          "statusCode": 200,
-          "headers": {'Access-Control-Allow-Origin': '*'},
-          "body": JSON.stringify(item)
-        })
-      })
-      .catch(err => {
-        context.succeed({
-          "statusCode": err.message.includes('SharesTable') ? 404 : 500,
-          "headers": {'Access-Control-Allow-Origin': '*'},
-          "body": JSON.stringify(err)
-        })
-      })
+      context.succeed(this.successResponse(item));
+    }, (e) => e.message.includes('SharesTable') ? 404 : 500);
   }
 
-  destroy(event, context) {
-    sharesTable.deleteItem(event.pathParameters.id)
-      .then(() => {
-        context.succeed({
-          "statusCode": 200,
-          "headers": {'Access-Control-Allow-Origin': '*'},
-          "body": ""
-        })
-      })
-      .catch(err => {
-        context.succeed({
-          "statusCode": 500,
-          "headers": {'Access-Control-Allow-Origin': '*'},
-          "body": JSON.stringify(err)
-        })
-      })
+  async destroy(event, context) {
+    await this.tryCatch(context,  async () => {
+      await sharesTable.deleteItem(event.pathParameters.id);
+      context.succeed(this.successResponse())
+    })
   }
 }
 
