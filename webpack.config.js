@@ -54,7 +54,8 @@ let serverConfig = {
   },
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'dist/server')
+    path: path.resolve(__dirname, 'dist/server'),
+    libraryTarget: 'commonjs2'
   },
   module: {
     rules: [
