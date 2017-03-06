@@ -2,8 +2,8 @@ import sharesTable from './sharesTable';
 import BaseController from './BaseController';
 
 class SharesController extends BaseController {
-  async create(event, context) {
-    await this.tryCatch(context, async () => {
+  create(event, context) {
+    this.tryCatch(context, async () => {
       let item = JSON.parse(event.body);
       item.iv = new Uint8Array(item.iv);
 
@@ -13,8 +13,8 @@ class SharesController extends BaseController {
     });
   }
 
-  async show(event, context) {
-    await this.tryCatch(context, async () => {
+  show(event, context) {
+    this.tryCatch(context, async () => {
       let item = await sharesTable.getItem(event.pathParameters.id);
       item.iv = Array.from(item.iv);
 
@@ -22,8 +22,8 @@ class SharesController extends BaseController {
     }, (e) => e.message.includes('SharesTable') ? 404 : 500);
   }
 
-  async destroy(event, context) {
-    await this.tryCatch(context,  async () => {
+  destroy(event, context) {
+    this.tryCatch(context,  async () => {
       await sharesTable.deleteItem(event.pathParameters.id);
       context.succeed(this.successResponse())
     })
