@@ -1,4 +1,4 @@
-import sharesTable from './sharesTable';
+import sharesTable from '../sharesTable';
 import BaseController from './BaseController';
 
 export default class SharesController extends BaseController {
