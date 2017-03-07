@@ -1,3 +1,2 @@
-import sharesController from './sharesController';
-const create = sharesController.create;
-export {create as handler}
+import SharesController from './SharesController';
+export default (...args) => new SharesController(...args).create()
