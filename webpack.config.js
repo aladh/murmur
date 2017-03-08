@@ -52,10 +52,10 @@ let clientConfig = {
 
 let serverConfig = {
   entry: {
-    createDynamoShare: './server/createDynamoShare',
-    readDynamoShare: './server/readDynamoShare',
-    deleteDynamoShare: './server/deleteDynamoShare',
-    deleteDropboxFile: './server/deleteDropboxFile'
+    sharesCreate: './server/lambdas/shares/create',
+    sharesShow: './server/lambdas/shares/show',
+    sharesDestroy: './server/lambdas/shares/destroy',
+    deleteDropboxFile: './server/lambdas/deleteDropboxFile'
   },
   output: {
     filename: '[name].js',
