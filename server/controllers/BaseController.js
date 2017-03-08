@@ -40,6 +40,7 @@ export default class BaseController {
   }
 
   notifyError(e) {
-    bugsnag.notify(e)
+    bugsnag.notify(e);
+    console.error(`Failed to process request: ${JSON.stringify(this.req)}`)
   }
 }
