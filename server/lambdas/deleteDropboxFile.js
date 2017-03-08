@@ -1,4 +1,4 @@
-import dropbox from '../shared/dropbox';
+import dropbox from '../../shared/dropbox';
 
 const handler = (event, context, callback) => {
   event.Records.forEach(record => {
