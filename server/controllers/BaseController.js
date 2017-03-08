@@ -41,6 +41,7 @@ export default class BaseController {
 
   notifyError(e) {
     bugsnag.notify(e);
+    console.error(`Error: ${JSON.stringify(e)}`);
     console.error(`Failed to process request: ${JSON.stringify(this.req)}`)
   }
 }

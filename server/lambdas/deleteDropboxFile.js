@@ -14,6 +14,7 @@ export default ({Records}, context, callback) => {
     callback(null, `Successfully processed ${Records.length} records.`);
   } catch(e) {
     bugsnag.notify(e);
+    console.error(`Error: ${JSON.stringify(e)}`);
     console.error(`Failed to process records: ${JSON.stringify(Records)}`)
   }
 }
