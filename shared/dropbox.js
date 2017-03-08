@@ -4,21 +4,21 @@ const client = (accessToken) => {
   return new Dropbox({accessToken})
 };
 
-const download = async function(shareLink) {
+const download = async (shareLink) => {
   let coreLink = shareLink.match(/\/s\/(.*)\?/)[1];
   let response = await fetch(`https://dl.dropboxusercontent.com/1/view/${coreLink}`);
   return response.blob()
 };
 
-const upload = async function(accessToken, blob, fileName) {
-  return await client(accessToken).filesUpload({
+const upload = (accessToken, blob, fileName) => {
+  return client(accessToken).filesUpload({
     path: `/${fileName}`,
     contents: blob
   })
 };
 
-const getSharedLink = async function(accessToken, fileName) {
-  return await client(accessToken).sharingCreateSharedLinkWithSettings({
+const getSharedLink = (accessToken, fileName) => {
+  return client(accessToken).sharingCreateSharedLinkWithSettings({
     path: `/${fileName}`
   })
 };
