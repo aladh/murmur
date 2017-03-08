@@ -6,7 +6,6 @@ export default class BaseController {
   constructor(req, res) {
     this.req = {...req, body: JSON.parse(req.body)};
     this.res = this.createResponse(res.succeed);
-    bugsnag.register(secrets.bugsnagApiKey)
   }
 
   // private
@@ -40,6 +39,7 @@ export default class BaseController {
   }
 
   notifyError(e) {
+    bugsnag.register(secrets.bugsnagApiKey);
     bugsnag.notify(e);
     console.error(`Error: ${JSON.stringify(e)}`);
     console.error(`Failed to process request: ${JSON.stringify(this.req)}`)

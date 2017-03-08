@@ -3,8 +3,6 @@ import dropbox from '../../shared/dropbox';
 import bugsnag from 'bugsnag';
 import secrets from '../secrets';
 
-bugsnag.register(secrets.bugsnagApiKey);
-
 export default ({Records}, context, callback) => {
   try {
     Records.forEach(record => {
@@ -13,6 +11,7 @@ export default ({Records}, context, callback) => {
 
     callback(null, `Successfully processed ${Records.length} records.`);
   } catch(e) {
+    bugsnag.register(secrets.bugsnagApiKey);
     bugsnag.notify(e);
     console.error(`Error: ${JSON.stringify(e)}`);
     console.error(`Failed to process records: ${JSON.stringify(Records)}`)
