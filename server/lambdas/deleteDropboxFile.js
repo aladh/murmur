@@ -3,9 +3,9 @@ import dropbox from '../../shared/dropbox';
 import bugsnag from 'bugsnag';
 import secrets from '../secrets';
 
-export default ({Records}, context, callback) => {
-  bugsnag.register(secrets.bugsnagApiKey);
+bugsnag.register(secrets.bugsnagApiKey);
 
+export default ({Records}, context, callback) => {
   try {
     Records.forEach(record => {
       if (record.eventName == 'REMOVE') dropbox.deleteFile(record.dynamodb.OldImage.accessToken.S, record.dynamodb.OldImage.fileName.S)
