@@ -1,2 +1,2 @@
-import SharesController from '../controllers/SharesController';
+import SharesController from '../../controllers/SharesController';
 export default (...args) => new SharesController(...args).destroy()
