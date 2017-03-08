@@ -52,9 +52,7 @@ let clientConfig = {
 
 let serverConfig = {
   entry: {
-    sharesCreate: './server/lambdas/shares/create',
-    sharesShow: './server/lambdas/shares/show',
-    sharesDestroy: './server/lambdas/shares/destroy',
+    sharesHandler: './server/lambdas/sharesHandler',
     deleteDropboxFile: './server/lambdas/deleteDropboxFile'
   },
   output: {

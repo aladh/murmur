@@ -1,4 +1,3 @@
-import 'babel-polyfill';
 import bugsnag from 'bugsnag';
 import secrets from '../secrets';
 
