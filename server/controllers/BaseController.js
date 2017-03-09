@@ -32,8 +32,9 @@ export default class BaseController {
     try {
       await fn()
     } catch(e) {
-      this.notifyError(e);
-      this.res.code(errCodeFn(e)).send(e)
+      let code = errCodeFn(e);
+      if (code > 499) this.notifyError(e);
+      this.res.status(code).send(e)
     }
   }
 
