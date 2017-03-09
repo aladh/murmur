@@ -38,10 +38,19 @@ export default class UploadPage extends React.Component {
 
     if(this.state.linkId) {
       return (
-        <span>
-          Your share link is:
+        <div>
+          <span>Your share link is: </span>
           <input value={`${utils.baseURL()}#${params.toString()}`} onClick={e => e.target.select()} readOnly />
-        </span>
+          <br/>
+          <br/>
+          <small>Note:
+            <ul>
+              <li>This link contains the key to decrypt your file</li>
+              <li>Your file will be deleted as soon as someone downloads it</li>
+              <li>If not downloaded in 7 days, your file will be deleted</li>
+            </ul>
+          </small>
+        </div>
       )
     }
   }
@@ -50,11 +59,11 @@ export default class UploadPage extends React.Component {
     return (
       <div>
         <h3>Upload a file</h3>
-        <span>Select a file to upload:</span>
         <input type='file' onChange={this.uploadFile}/>
-        <div />
+        <br/>
+        <br/>
         <Status message={this.state.status} />
-        <div />
+        <br/>
         {this.renderShareLink()}
       </div>
     );

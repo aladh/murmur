@@ -76,6 +76,7 @@ export default class DownloadPage extends React.Component {
           {this.renderDownloadSection()}
         </div>
         <div />
+        <br/>
         <Status message={this.state.status} />
       </div>
     )
