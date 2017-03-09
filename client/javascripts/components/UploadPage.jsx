@@ -57,7 +57,7 @@ export default class UploadPage extends React.Component {
 
   render() {
     return (
-      <div>
+      <div className="upload-page">
         <h3>Upload a file</h3>
         <input type='file' onChange={this.uploadFile}/>
         <br/>
