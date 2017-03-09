@@ -34,7 +34,7 @@ export default class BaseController {
     } catch(e) {
       let code = errCodeFn(e);
       if (code > 499) this.notifyError(e);
-      this.res.status(code).send(e)
+      this.res.status(code).send()
     }
   }
 
