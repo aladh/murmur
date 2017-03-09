@@ -5,7 +5,7 @@ import utils from '../utils';
 
 export default class AuthPage extends React.Component {
   dbx = new Dropbox({clientId: secrets.dropboxClientId});
-  state = {authUrl: ''}
+  state = {authUrl: ''};
 
   componentDidMount() {
     this.setState({authUrl: this.dbx.getAuthenticationUrl(utils.baseURL())})
@@ -14,9 +14,9 @@ export default class AuthPage extends React.Component {
   render() {
     return (
       <div>
-        <h3>Choose a provider</h3>
+        <h3>Choose a storage provider</h3>
         <a href={this.state.authUrl}>
-          Authenticate with Dropbox
+          Dropbox
         </a>
       </div>
     )
