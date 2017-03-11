@@ -1,27 +1,28 @@
 import sharesTable from '../models/sharesTable';
-import BaseController from './BaseController';
 
-export default class SharesController extends BaseController {
-  create = () => {
-    this.tryCatch(async () => {
-      let item = {...this.req.body, iv: new Uint8Array(this.req.body.iv)};
-      await sharesTable.putItem(item.id, item.iv, item.fileName, item.accessToken, item.shareLink);
-      this.res.send()
-    });
-  };
+const create = async(req, res) => {
+  let item = {...req.body, iv: new Uint8Array(req.body.iv)};
+  await sharesTable.putItem(item.id, item.iv, item.fileName, item.accessToken, item.shareLink);
+  res.end()
+};
 
-  show = () => {
-    this.tryCatch(async () => {
-      let item = await sharesTable.getItem(this.req.pathParameters.id);
-      item.iv = Array.from(item.iv);
-      this.res.send(item)
-    }, (e) => e.message.includes('SharesTable') ? 404 : 500);
-  };
-
-  destroy = () => {
-    this.tryCatch(async () => {
-      await sharesTable.deleteItem(this.req.pathParameters.id);
-      this.res.send()
-    })
+const show = async(req, res) => {
+  try {
+    let item = await sharesTable.getItem(req.pathParameters.id);
+    item.iv = Array.from(item.iv);
+    res.send(item)
+  } catch (e) {
+    if (e.message.includes('SharesTable')) {
+      res.status(404).end()
+    } else {
+      throw e
+    }
   }
-}
+};
+
+const destroy = async(req, res) => {
+  await sharesTable.deleteItem(req.pathParameters.id);
+  res.end()
+};
+
+export default {create, show, destroy}

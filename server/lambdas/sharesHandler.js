@@ -1,5 +1,4 @@
 import 'babel-polyfill';
-import SharesController from '../controllers/SharesController';
-import router from '../router';
+import route from '../router';
 
-export default (event, context) => router(event, context, SharesController)
+export default (event, context) => route(event, context)
