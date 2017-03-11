@@ -8,7 +8,7 @@ const create = async(req, res) => {
 
 const show = async(req, res) => {
   try {
-    let item = await sharesTable.getItem(req.pathParameters.id);
+    let item = await sharesTable.getItem(req.params.id);
     item.iv = Array.from(item.iv);
     res.send(item)
   } catch (e) {
@@ -21,7 +21,7 @@ const show = async(req, res) => {
 };
 
 const destroy = async(req, res) => {
-  await sharesTable.deleteItem(req.pathParameters.id);
+  await sharesTable.deleteItem(req.params.id);
   res.end()
 };
 

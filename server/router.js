@@ -22,25 +22,27 @@ const createResponse = (responseFn) => {
   return response
 };
 
-export default async (event, context) => {
+export default async ({resource, httpMethod, body, pathParameters}, {succeed}) => {
   try {
-    let req = {...event, body: JSON.parse(event.body)};
-    let res = createResponse(context.succeed);
+    let req = {
+      body: JSON.parse(body),
+      params: pathParameters
+    };
 
-    if (event.resource == '/{id}' && event.httpMethod == 'GET') {
+    let res = createResponse(succeed);
+
+    if (resource == '/{id}' && httpMethod == 'GET') {
       await show(req, res)
-    } else if (event.resource == '/{id}' && event.httpMethod == 'DELETE') {
+    } else if (resource == '/{id}' && httpMethod == 'DELETE') {
       await destroy(req, res)
-    } else if (event.resource == '/' && event.httpMethod == 'POST') {
+    } else if (resource == '/' && httpMethod == 'POST') {
       await create(req, res)
     }
   } catch(e) {
     bugsnag.register(secrets.bugsnagApiKey);
-    bugsnag.notify(e, {
-      request: event
-    });
+    bugsnag.notify(e);
 
-    context.succeed({
+    succeed({
       statusCode: 500,
       headers: {'Access-Control-Allow-Origin': '*'}
     })
