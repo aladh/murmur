@@ -1,4 +1,4 @@
-import {create, show, destroy} from 'controllers/SharesController';
+import {create, show, destroy} from './controllers/SharesController';
 import bugsnag from 'bugsnag';
 import secrets from './secrets';
 
