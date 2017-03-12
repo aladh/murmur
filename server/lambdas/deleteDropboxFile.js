@@ -13,8 +13,6 @@ export default ({Records}, context, callback) => {
   } catch(e) {
     bugsnag.register(secrets.bugsnagApiKey);
     bugsnag.notify(e);
-    console.error(`Error: ${JSON.stringify(e)}`);
-    console.error(`Failed to process records: ${JSON.stringify(Records)}`);
-    throw e
+    callback(e)
   }
 }
