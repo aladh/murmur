@@ -1,7 +1,7 @@
 import React from 'react';
 import utils from '../utils';
 import Status from './Status';
-import secrets from '../../secrets';
+import api from '../api';
 
 export default class DownloadPage extends React.Component {
   static propTypes = {
@@ -16,37 +16,51 @@ export default class DownloadPage extends React.Component {
     return this.key
   }
 
-  deleteFile() {
-    fetch(`https://api.biimer.com/shares/${this.fileData.id}`, {
-      method: 'DELETE',
-      headers: {'x-api-key': secrets.apiKey}
-    });
+  async deleteFile() {
+    try {
+      await api.deleteShare(this.share.id)
+    } catch(e) {
+      Bugsnag.notify(e, {
+        shareId: this.share.id
+      });
+    }
   }
 
   downloadFile = async () => {
-    this.setState({status: 'Downloading'});
-    let fileBlob = await utils.dropbox.download(this.fileData.shareLink);
-    this.setState({status: 'Decrypting'});
-    let decrypted = await utils.decrypt(await utils.bufferFromBlob(fileBlob), await this.getKey(), this.fileData.iv);
-    this.deleteFile();
-    utils.saveToDisk(new Blob([decrypted]), this.decryptedFileName);
-    this.setState({downloaded: true, status: 'Done!'})
+    try {
+      this.setState({status: 'Downloading'});
+      let fileBlob = await utils.dropbox.download(this.share.shareLink);
+      this.setState({status: 'Decrypting'});
+      let decrypted = await utils.decrypt(await utils.bufferFromBlob(fileBlob), await this.getKey(), this.share.iv);
+      this.deleteFile();
+      utils.saveToDisk(new Blob([decrypted]), this.decryptedFileName);
+      this.setState({downloaded: true, status: 'Done!'})
+    } catch(e) {
+      await this.setState({status: 'An unexpected error occurred', loading: false});
+      throw e
+    }
   };
 
-  async loadFileData() {
-    let response = await fetch(`https://api.biimer.com/shares/${this.props.shareId}`, {
-      headers: {'x-api-key': secrets.apiKey}
-    });
-    if (response.status != 200) return null;
-    let fileData = await response.json();
-    return {...fileData, iv: new Uint8Array(fileData.iv)}
+  async loadShare() {
+    try {
+      let share = await api.getShare(this.props.shareId);
+      return {...share, iv: new Uint8Array(share.iv)}
+    } catch(e) {
+      Bugsnag.notify(e);
+      return null
+    }
   }
 
   async componentDidMount() {
-    this.fileData = await this.loadFileData();
-    if (!this.fileData) return this.setState({loading: false});
-    this.decryptedFileName = await utils.decryptedFileName(this.fileData.fileName, this.fileData.iv, await this.getKey());
-    this.setState({fileName: this.decryptedFileName, loading: false})
+    try {
+      this.share = await this.loadShare();
+      if (!this.share) return this.setState({loading: false});
+      this.decryptedFileName = await utils.decryptedFileName(this.share.fileName, this.share.iv, await this.getKey());
+      this.setState({fileName: this.decryptedFileName, loading: false})
+    } catch(e) {
+      await this.setState({status: 'An unexpected error occurred', loading: false});
+      throw e
+    }
   }
 
   renderDownloadButton() {

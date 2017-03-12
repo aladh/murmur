@@ -7,6 +7,8 @@ const client = (accessToken) => {
 const download = async (shareLink) => {
   let coreLink = shareLink.match(/\/s\/(.*)\?/)[1];
   let response = await fetch(`https://dl.dropboxusercontent.com/1/view/${coreLink}`);
+
+  if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`);
   return response.blob()
 };
 

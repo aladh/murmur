@@ -1,7 +1,7 @@
 import React from 'react';
 import utils from '../utils';
 import Status from './Status';
-import secrets from '../../secrets';
+import api from '../api';
 
 export default class UploadPage extends React.Component {
   static propTypes = {
@@ -11,24 +11,30 @@ export default class UploadPage extends React.Component {
   state = {linkId: '', key: '', status: ''};
 
   uploadFile = async ({target: {files}}) => {
-    let [file] = files;
-    this.setState({status: 'Encrypting'});
-    let {iv, jwk, encrypted, key} = await utils.encrypt(await utils.bufferFromBlob(file));
+    try {
+      let [file] = files;
+      this.setState({status: 'Encrypting'});
+      let {iv, jwk, encrypted, key} = await utils.encrypt(await utils.bufferFromBlob(file));
 
-    let encryptedFileName = await utils.encryptedFileName(file.name, iv, key);
-    this.setState({status: 'Uploading'});
-    await utils.dropbox.upload(this.props.dropboxAccessToken, new Blob([encrypted]), encryptedFileName);
+      let encryptedFileName = await utils.encryptedFileName(file.name, iv, key);
+      this.setState({status: 'Uploading'});
+      await utils.dropbox.upload(this.props.dropboxAccessToken, new Blob([encrypted]), encryptedFileName);
 
-    let {url: shareLink} = await utils.dropbox.getSharedLink(this.props.dropboxAccessToken, encryptedFileName);
-    let linkId = await utils.sha256(encryptedFileName);
+      let {url: shareLink} = await utils.dropbox.getSharedLink(this.props.dropboxAccessToken, encryptedFileName);
+      let linkId = await utils.sha256(encryptedFileName);
 
-    await fetch('https://api.biimer.com/shares/', {
-      headers: {'x-api-key': secrets.apiKey},
-      method: 'POST',
-      body: JSON.stringify({id: linkId, iv: Array.from(iv), fileName: encryptedFileName, accessToken: this.props.dropboxAccessToken, shareLink})
-    });
+      await api.createShare({
+        id: linkId,
+        iv: Array.from(iv),
+        fileName: encryptedFileName,
+        accessToken: this.props.dropboxAccessToken,
+        shareLink});
 
-    this.setState({linkId: linkId, key: jwk, status: 'Done!'})
+      this.setState({linkId: linkId, key: jwk, status: 'Done!'})
+    } catch(e) {
+      await this.setState({status: 'An unexpected error occurred'});
+      throw e
+    }
   };
 
   renderShareLink() {
