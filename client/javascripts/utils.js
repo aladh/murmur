@@ -31,12 +31,17 @@ const decrypt = async function(buffer, key, iv) {
   return await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, buffer);
 };
 
+function removePadding(s) {
+  return s.endsWith('=') ? removePadding(s.slice(0, s.length - 1)) : s
+}
+
 const encryptedFileName = async function(fileName, iv, key) {
   let encryptedBuffer = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, new TextEncoder().encode(fileName));
   let encryptedBufferArray = Array.from(new Uint8Array(encryptedBuffer));
   let encryptedString = encryptedBufferArray.map(byte => String.fromCharCode(byte)).join('');
+  let base32String = base32.encode(encryptedString);
 
-  return base32.encode(encryptedString)
+  return removePadding(base32String.toLowerCase())
 };
 
 const sha256 = async function(message) {
@@ -51,8 +56,14 @@ const importKey = async function(jwk) {
   return await window.crypto.subtle.importKey("jwk", {kty: "oct", k: jwk, alg: "A256GCM", ext: true}, {name: "AES-GCM"}, false, ["encrypt", "decrypt"]);
 };
 
+function addPadding(s) {
+  let paddingLength = 8 - (s.length % 8);
+  let padding = '========';
+  return `${s}${padding.slice(0, paddingLength)}`
+}
+
 const decryptedFileName = async function(encryptedFileName, iv, key) {
-  let encryptedText = base32.decode(encryptedFileName);
+  let encryptedText = base32.decode(addPadding(encryptedFileName.toUpperCase()));
   let encryptedBuffer = new Uint8Array(encryptedText.split('').map(ch => ch.charCodeAt(0)));
   let decryptedBuffer = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, encryptedBuffer);
 
