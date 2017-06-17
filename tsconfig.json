@@ -9,6 +9,17 @@
     "allowSyntheticDefaultImports": true,
     "allowJs": true
   },
+  "awesomeTypescriptLoaderOptions": {
+    "useBabel": true,
+    "useCache": true,
+    "babelOptions": {
+      "presets": [
+        ["env", {"modules": false}],
+        "stage-0",
+        "react"
+      ]
+    }
+  },
   "include": [
     "./src/**/*"
   ]

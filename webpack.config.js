@@ -16,15 +16,13 @@ module.exports = {
       { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
       { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
       {
-        test: /\.(js|jsx|ts|tsx)$/,
+        test: /\.(js|jsx)$/,
         exclude: path.resolve(__dirname, 'node_modules/'),
         use: {
           loader: 'babel-loader',
           options: {
             presets: [
-              ['env', {
-                modules: false
-              }],
+              ['env', { modules: false }],
               'stage-0',
               'react'
             ]
