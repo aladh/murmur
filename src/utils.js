@@ -44,14 +44,6 @@ const encryptedFilename = async function(filename, iv, key) {
   return removePadding(base32String.toLowerCase())
 };
 
-const sha256 = async function(message) {
-  const msgBuffer = new TextEncoder('utf-8').encode(message);                     // encode as UTF-8
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);            // hash the message
-  const hashArray = Array.from(new Uint8Array(hashBuffer));                       // convert ArrayBuffer to Array
-  const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join(''); // convert bytes to hex string
-  return hashHex;
-};
-
 const importKey = async function(jwk) {
   return await window.crypto.subtle.importKey("jwk", {kty: "oct", k: jwk, alg: "A256GCM", ext: true}, {name: "AES-GCM"}, false, ["encrypt", "decrypt"]);
 };
@@ -85,5 +77,5 @@ const baseURL = function() {
   return process.env.NODE_ENV === 'production' ? 'https://biimer.com/' : 'http://localhost:8081/'
 };
 
-export default {bufferFromBlob, encrypt, encryptedFilename, sha256, importKey,
+export default {bufferFromBlob, encrypt, encryptedFilename, importKey,
                 decrypt, decryptedFilename, saveToDisk, dropbox, baseURL};
