@@ -48,4 +48,4 @@ module.exports = {
     port: 8081,
     historyApiFallback: true
   }
-}
+};
