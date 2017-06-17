@@ -1,11 +1,11 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
-const isProduction = process.env.NODE_ENV == 'production';
+const isProduction = process.env.NODE_ENV === 'production';
 
-let clientConfig = {
+module.exports = {
   entry: {
-    client: './client/initialize'
+    client: './src/initialize'
   },
   output: {
     filename: isProduction ? '[name]-[chunkhash].js' : '[name].js',
@@ -41,52 +41,11 @@ let clientConfig = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './client/assets/index.html'
+      template: './assets/index.html'
     })
   ],
   devServer: {
     port: 8081,
     historyApiFallback: true
   }
-};
-
-let serverConfig = {
-  entry: {
-    sharesHandler: './server/lambdas/sharesHandler',
-    deleteDropboxFile: './server/lambdas/deleteDropboxFile'
-  },
-  output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'dist/server'),
-    libraryTarget: 'commonjs2'
-  },
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        exclude: path.resolve(__dirname, 'node_modules/'),
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              ['env', {
-                modules: false,
-              }],
-              'stage-0'
-            ]
-          }
-        }
-      }
-    ]
-  },
-  resolve: {
-    extensions: ['.js']
-  },
-  plugins: [
-    new webpack.IgnorePlugin(/vertx/),
-    new webpack.DefinePlugin({ "global.GENTLY": false })
-  ],
-  target: 'node'
-};
-
-module.exports = [clientConfig, serverConfig];
+}

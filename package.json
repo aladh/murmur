@@ -10,7 +10,6 @@
     "build": "NODE_ENV=production webpack -p"
   },
   "dependencies": {
-    "aws-sdk": "^2.20.0",
     "babel-polyfill": "^6.23.0",
     "bugsnag": "github:ali-l/bugsnag-node",
     "dropbox": "^2.5.1",

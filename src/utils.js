@@ -1,5 +1,5 @@
 import base32 from 'hi-base32';
-import dropbox from '../../shared/dropbox';
+import dropbox from './dropbox';
 
 const bufferFromBlob = async function(blob) {
   let reader = new FileReader();
