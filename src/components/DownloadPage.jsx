@@ -1,12 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import utils from '../utils';
 import Status from './Status';
 import api from '../api';
 
 export default class DownloadPage extends React.Component {
   static propTypes = {
-    shareId: React.PropTypes.string.isRequired,
-    jwk: React.PropTypes.string
+    shareId: PropTypes.string.isRequired,
+    jwk: PropTypes.string
   };
 
   state = {loading: true, downloaded: false, status: ''};

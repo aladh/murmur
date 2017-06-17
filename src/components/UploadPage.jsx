@@ -1,11 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import utils from '../utils';
 import Status from './Status';
 import api from '../api';
 
 export default class UploadPage extends React.Component {
   static propTypes = {
-    dropboxAccessToken: React.PropTypes.string.isRequired
+    dropboxAccessToken: PropTypes.string.isRequired
   };
 
   state = {linkId: '', key: '', status: ''};
