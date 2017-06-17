@@ -7,7 +7,7 @@ module.exports = {
   entry: './src/index.tsx',
   output: {
     filename: isProduction ? 'bundle-[chunkhash].js' : 'bundle.js',
-    path: __dirname + 'dist',
+    path: path.resolve(__dirname, 'dist'),
     publicPath: '/'
   },
   module: {
