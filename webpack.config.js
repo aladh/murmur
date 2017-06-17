@@ -7,7 +7,7 @@ module.exports = {
   entry: './src/initialize',
   output: {
     filename: isProduction ? '[name]-[chunkhash].js' : '[name].js',
-    path: path.resolve(__dirname, isProduction ? 'dist/client' : 'dist'),
+    path: path.resolve(__dirname, isProduction ? 'dist' : 'dist'),
     publicPath: '/'
   },
   module: {
