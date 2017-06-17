@@ -4,14 +4,17 @@ const webpack = require('webpack');
 const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
-  entry: './src/initialize',
+  entry: './src/index.tsx',
   output: {
-    filename: isProduction ? '[name]-[chunkhash].js' : '[name].js',
-    path: path.resolve(__dirname, isProduction ? 'dist' : 'dist'),
+    filename: isProduction ? 'bundle-[chunkhash].js' : 'bundle.js',
+    path: __dirname + 'dist',
     publicPath: '/'
   },
   module: {
     rules: [
+      { test: /\.scss$/, use: ['style-loader', 'css-loader', 'sass-loader'] },
+      { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
+      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
       {
         test: /\.(js|jsx)$/,
         exclude: path.resolve(__dirname, 'node_modules/'),
@@ -27,15 +30,11 @@ module.exports = {
             ]
           }
         }
-      },
-      {
-        test: /\.scss$/,
-        use: ['style-loader', 'css-loader', 'sass-loader']
       }
     ]
   },
   resolve: {
-    extensions: ['.scss', '.jsx', '.js']
+    extensions: ['.scss', '.jsx', '.js', '.ts', '.tsx', '.json']
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -46,5 +45,5 @@ module.exports = {
     port: 8081,
     historyApiFallback: true
   },
-  devtool: isProduction ? false : 'cheap-module-eval-source-map'
+  devtool: isProduction ? false : 'source-map'
 };
