@@ -4,20 +4,24 @@ import DownloadPage from './DownloadPage';
 import AuthPage from './AuthPage';
 
 export default class App extends React.Component {
-  state = this.stateFromParams();
+  state = this.parseHashParams();
 
-  stateFromParams() {
-    return {
-      params: new URLSearchParams(location.hash.slice(1))
-    }
+  parseHashParams() {
+    return {params: new URLSearchParams(location.hash.slice(1))}
   }
 
   routeToPage() {
     let dropboxAccessToken = this.state.params.get('access_token');
-    let shareId = this.state.params.get('share');
 
-    if(shareId) {
-      return <DownloadPage shareId={shareId} jwk={this.state.params.get('key')} />
+    if(this.downloadParamsPresent()) {
+      return (
+        <DownloadPage
+          jwk={this.state.params.get('key')}
+          iv={this.state.params.get('iv')}
+          filename={this.state.params.get('filename')}
+          shareLink={this.state.params.get('shareLink')}
+        />
+      )
     } else if(!dropboxAccessToken) {
       return <AuthPage />
     } else {
@@ -25,8 +29,13 @@ export default class App extends React.Component {
     }
   }
 
+  downloadParamsPresent() {
+    let params = this.state.params;
+    return params.has('iv') && params.has('key') && params.has('shareLink') && params.has('filename')
+  }
+
   componentDidMount() {
-    window.onpopstate = () => this.setState(this.stateFromParams())
+    window.onpopstate = () => this.setState(this.parseHashParams())
   }
 
   render() {

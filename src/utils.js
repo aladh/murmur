@@ -35,8 +35,8 @@ function removePadding(s) {
   return s.endsWith('=') ? removePadding(s.slice(0, s.length - 1)) : s
 }
 
-const encryptedFileName = async function(fileName, iv, key) {
-  let encryptedBuffer = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, new TextEncoder().encode(fileName));
+const encryptedFilename = async function(filename, iv, key) {
+  let encryptedBuffer = await window.crypto.subtle.encrypt({name: "AES-GCM", iv: iv}, key, new TextEncoder().encode(filename));
   let encryptedBufferArray = Array.from(new Uint8Array(encryptedBuffer));
   let encryptedString = encryptedBufferArray.map(byte => String.fromCharCode(byte)).join('');
   let base32String = base32.encode(encryptedString);
@@ -62,28 +62,28 @@ function addPadding(s) {
   return `${s}${padding.slice(0, paddingLength)}`
 }
 
-const decryptedFileName = async function(encryptedFileName, iv, key) {
-  let encryptedText = base32.decode(addPadding(encryptedFileName.toUpperCase()));
+const decryptedFilename = async function(encryptedFilename, iv, key) {
+  let encryptedText = base32.decode(addPadding(encryptedFilename.toUpperCase()));
   let encryptedBuffer = new Uint8Array(encryptedText.split('').map(ch => ch.charCodeAt(0)));
   let decryptedBuffer = await window.crypto.subtle.decrypt({name: "AES-GCM", iv: iv}, key, encryptedBuffer);
 
   return new TextDecoder().decode(decryptedBuffer)
 };
 
-const saveToDisk = function(blob, fileName) {
+const saveToDisk = function(blob, filename) {
   let url = window.URL.createObjectURL(blob);
   let a = document.createElement("a");
   document.body.appendChild(a);
   a.style = "display: none";
   a.href = url;
-  a.download = fileName;
+  a.download = filename;
   a.click();
   window.URL.revokeObjectURL(url);
 };
 
 const baseURL = function() {
-  return process.env.NODE_ENV == 'production' ? 'https://biimer.com/' : 'http://localhost:8081/'
+  return process.env.NODE_ENV === 'production' ? 'https://biimer.com/' : 'http://localhost:8081/'
 };
 
-export default {bufferFromBlob, encrypt, encryptedFileName, sha256, importKey,
-                decrypt, decryptedFileName, saveToDisk, dropbox, baseURL};
+export default {bufferFromBlob, encrypt, encryptedFilename, sha256, importKey,
+                decrypt, decryptedFilename, saveToDisk, dropbox, baseURL};

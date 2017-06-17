@@ -12,22 +12,22 @@ const download = async (shareLink) => {
   return response.blob()
 };
 
-const upload = (accessToken, blob, fileName) => {
+const upload = (accessToken, blob, filename) => {
   return client(accessToken).filesUpload({
-    path: `/${fileName}`,
+    path: `/${filename}`,
     contents: blob
   })
 };
 
-const getSharedLink = (accessToken, fileName) => {
+const getSharedLink = (accessToken, filename) => {
   return client(accessToken).sharingCreateSharedLinkWithSettings({
-    path: `/${fileName}`
+    path: `/${filename}`
   })
 };
 
-const deleteFile = (accessToken, fileName) => {
+const deleteFile = (accessToken, filename) => {
   return client(accessToken).filesDelete({
-    path: `/${fileName}`
+    path: `/${filename}`
   })
 };
 

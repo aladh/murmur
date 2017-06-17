@@ -4,9 +4,7 @@ const webpack = require('webpack');
 const isProduction = process.env.NODE_ENV === 'production';
 
 module.exports = {
-  entry: {
-    client: './src/initialize'
-  },
+  entry: './src/initialize',
   output: {
     filename: isProduction ? '[name]-[chunkhash].js' : '[name].js',
     path: path.resolve(__dirname, isProduction ? 'dist/client' : 'dist'),
@@ -47,5 +45,6 @@ module.exports = {
   devServer: {
     port: 8081,
     historyApiFallback: true
-  }
+  },
+  devtool: isProduction ? false : 'cheap-module-eval-source-map'
 };
