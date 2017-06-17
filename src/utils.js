@@ -1,5 +1,5 @@
 import base32 from 'hi-base32';
-import dropbox from './dropbox';
+import dropbox from './storage/Dropbox';
 
 const bufferFromBlob = async function(blob) {
   let reader = new FileReader();
@@ -8,7 +8,7 @@ const bufferFromBlob = async function(blob) {
   await new Promise((resolve) => {
     let interval =
       setInterval(() => {
-        if(reader.readyState == 2) {
+        if(reader.readyState === 2) {
           clearInterval(interval);
           resolve()
         }

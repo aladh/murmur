@@ -25,12 +25,10 @@ export default class UploadPage extends React.Component {
       this.setState({status: 'Uploading'});
       await utils.dropbox.upload(this.props.dropboxAccessToken, new Blob([encrypted]), encryptedFilename);
 
-      let {url: shareLink} = await utils.dropbox.getSharedLink(this.props.dropboxAccessToken, encryptedFilename);
-
       this.iv = JSON.stringify(Array.from(iv));
       this.filename = encryptedFilename;
       this.key = jwk;
-      this.shareLink = shareLink;
+      this.shareLink = await utils.dropbox.getDownloadLink(this.props.dropboxAccessToken, encryptedFilename);
 
       this.setState({status: STATUS_DONE})
     } catch(e) {
