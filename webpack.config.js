@@ -16,7 +16,7 @@ module.exports = {
       { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
       { enforce: "pre", test: /\.js$/, loader: "source-map-loader" },
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: path.resolve(__dirname, 'node_modules/'),
         use: {
           loader: 'babel-loader',
