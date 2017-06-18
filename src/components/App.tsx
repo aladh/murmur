@@ -3,12 +3,12 @@ import UploadPage from './UploadPage';
 import DownloadPage from './DownloadPage';
 import AuthPage from './AuthPage';
 
-export default class App extends React.Component {
-  state = this.parseHashParams();
+const parseHashParams = () => {
+  return {params: new URLSearchParams(window.location.hash.slice(1))}
+};
 
-  parseHashParams() {
-    return {params: new URLSearchParams(location.hash.slice(1))}
-  }
+export default class App extends React.Component<{}, {params: URLSearchParams}> {
+  state = parseHashParams();
 
   routeToPage() {
     let dropboxAccessToken = this.state.params.get('access_token');
@@ -35,7 +35,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    window.onpopstate = () => this.setState(this.parseHashParams())
+    window.onpopstate = () => this.setState(parseHashParams())
   }
 
   render() {

@@ -1,14 +1,14 @@
 import React from 'react';
 import Dropbox from 'dropbox';
-import secrets from '../../secrets';
+import secrets from '../../secrets.json';
 import utils from '../utils';
 
-export default class AuthPage extends React.Component {
+export default class AuthPage extends React.Component<{}, {authUrl: string}> {
   dbx = new Dropbox({clientId: secrets.dropboxClientId});
   state = {authUrl: ''};
 
   componentDidMount() {
-    this.setState({authUrl: this.dbx.getAuthenticationUrl(utils.baseURL())})
+    this.setState({authUrl: this.dbx.getAuthenticationUrl(utils.baseURL)})
   }
 
   render() {

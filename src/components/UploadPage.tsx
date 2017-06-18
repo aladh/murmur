@@ -1,31 +1,27 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import utils from '../utils';
 import Status from './Status';
 
 const STATUS_DONE = 'Done!';
 
-export default class UploadPage extends React.Component {
-  static propTypes = {dropboxAccessToken: PropTypes.string.isRequired};
-
+export default class UploadPage extends React.Component<{dropboxAccessToken: string}, {status: string}> {
   state = {status: ''};
-  iv = null;
-  filename = null;
-  key = null;
-  shareLink = null;
+  iv: string = null;
+  filename: string = null;
+  key: string = null;
+  shareLink: string = null;
 
-
-  uploadFile = async ({target: {files}}) => {
+  uploadFile = async ({target: {files}}: { target: HTMLInputElement }) => {
     try {
-      let [file] = files;
+      let file = files[0];
       this.setState({status: 'Encrypting'});
       let {iv, jwk, encrypted, key} = await utils.encrypt(await utils.bufferFromBlob(file));
 
-      let encryptedFilename = await utils.encryptedFilename(file.name, iv, key);
+      let encryptedFilename = await utils.encryptedFilename(file.name, (iv as Uint8Array), key);
       this.setState({status: 'Uploading'});
       await utils.dropbox.upload(this.props.dropboxAccessToken, new Blob([encrypted]), encryptedFilename);
 
-      this.iv = JSON.stringify(Array.from(iv));
+      this.iv = JSON.stringify(Array.from((iv as Uint8Array)));
       this.filename = encryptedFilename;
       this.key = jwk;
       this.shareLink = await utils.dropbox.getDownloadLink(this.props.dropboxAccessToken, encryptedFilename);
@@ -49,7 +45,7 @@ export default class UploadPage extends React.Component {
     return (
       <div>
         <span>Your share link is: </span>
-        <input value={`${utils.baseURL()}#${params.toString()}`} onClick={e => e.target.select()} readOnly/>
+        <input value={`${utils.baseURL}#${params.toString()}`} onClick={({target}) => (target as HTMLInputElement).select()} readOnly/>
       </div>
     )
   }
@@ -58,7 +54,7 @@ export default class UploadPage extends React.Component {
     return (
       <div className="upload-page">
         <h3>Upload a file</h3>
-        <input type='file' onChange={this.uploadFile}/>
+        <input type='file' onChange={this.uploadFile} />
         <br/>
         <br/>
         <Status message={this.state.status} />

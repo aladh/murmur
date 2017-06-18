@@ -1,19 +1,25 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import utils from '../utils';
 import Status from './Status';
 
-export default class DownloadPage extends React.Component {
-  static propTypes = {
-    jwk: PropTypes.string.isRequired,
-    iv: PropTypes.string.isRequired,
-    shareLink: PropTypes.string.isRequired,
-    filename: PropTypes.string.isRequired,
-  };
+interface Props {
+  jwk: string;
+  iv: string;
+  shareLink: string;
+  filename: string;
+}
 
-  state = {loading: true, downloaded: false, status: ''};
-  key = null;
-  share = null;
+interface State {
+  loading: boolean;
+  downloaded: boolean;
+  status: string;
+  filename: string;
+}
+
+export default class DownloadPage extends React.Component<Props, State> {
+  state = {loading: true, downloaded: false, status: '', filename: ''};
+  key: CryptoKey = null;
+  decryptedFilename: string = null;
 
   async getKey() {
     if(!this.key) this.key = await utils.importKey(this.props.jwk);
@@ -23,9 +29,9 @@ export default class DownloadPage extends React.Component {
   downloadFile = async () => {
     try {
       this.setState({status: 'Downloading'});
-      let fileBlob = await utils.dropbox.download(this.share.shareLink);
+      let fileBlob = await utils.dropbox.download(this.props.shareLink);
       this.setState({status: 'Decrypting'});
-      let decrypted = await utils.decrypt(await utils.bufferFromBlob(fileBlob), await this.getKey(), this.share.iv);
+      let decrypted = await utils.decrypt(await utils.bufferFromBlob(fileBlob), await this.getKey(), new Uint8Array(JSON.parse(this.props.iv)));
       utils.saveToDisk(new Blob([decrypted]), this.decryptedFilename);
       this.setState({downloaded: true, status: 'Done!'})
     } catch(e) {
@@ -36,10 +42,8 @@ export default class DownloadPage extends React.Component {
 
   async componentDidMount() {
     try {
-      this.share = {...this.props, iv: new Uint8Array(JSON.parse(this.props.iv))};
-
-      if (!this.share) return this.setState({loading: false});
-      this.decryptedFilename = await utils.decryptedFilename(this.share.filename, this.share.iv, await this.getKey());
+      if (!this.key) return this.setState({loading: false});
+      this.decryptedFilename = await utils.decryptedFilename(this.props.filename, new Uint8Array(JSON.parse(this.props.iv)), await this.getKey());
       this.setState({filename: this.decryptedFilename, loading: false})
     } catch(e) {
       await this.setState({status: 'An unexpected error occurred', loading: false});
