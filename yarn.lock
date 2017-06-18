@@ -12,6 +12,10 @@
   version "15.0.29"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-15.0.29.tgz#a10831b9d025bcef6cab7bc1c6547bdddbabc938"
 
+"@types/text-encoding@^0.0.30":
+  version "0.0.30"
+  resolved "https://registry.yarnpkg.com/@types/text-encoding/-/text-encoding-0.0.30.tgz#2ad7bc19287094c9d2754d238e0994dd2995781f"
+
 abbrev@1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.0.tgz#d0554c2256636e2f56e7c2e5ad183f859428d81f"
