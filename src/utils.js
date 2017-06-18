@@ -74,7 +74,7 @@ const saveToDisk = function(blob, filename) {
 };
 
 const baseURL = function() {
-  return process.env.NODE_ENV === 'production' ? 'https://biimer.com/' : 'http://localhost:8081/'
+  return `${window.location.origin}/`
 };
 
 export default {bufferFromBlob, encrypt, encryptedFilename, importKey,
