@@ -3,12 +3,13 @@
     "outDir": "./dist/",
     "sourceMap": true,
     "noImplicitAny": true,
-    "target": "ES6",
+    "target": "ESNext",
     "module": "ES6",
-    "moduleResolution": "node",
+    "lib": ["DOM", "ESNext", "DOM.Iterable", "ScriptHost"],
+    "moduleResolution": "Node",
     "jsx": "preserve",
     "allowSyntheticDefaultImports": true,
-    "allowJs": true
+    "allowJs": false
   },
   "awesomeTypescriptLoaderOptions": {
     "useBabel": true,
