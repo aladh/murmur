@@ -2,7 +2,7 @@ import "babel-polyfill";
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
 import App from './components/App';
-import '../styles/application';
+import '../styles/application.css';
 
 // TODO: Polyfill URLSearchParams, TextEncoder/TextDecoder
 

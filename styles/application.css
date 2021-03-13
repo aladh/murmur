@@ -1,0 +1,18 @@
+.download-section {
+    transition: opacity .5s linear;
+    visibility: visible;
+    opacity: 1;
+}
+
+.download-section .hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.upload-page ul {
+    padding-left: 12px;
+}
+
+.upload-page input {
+    width: 100%;
+}
