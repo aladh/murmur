@@ -42,7 +42,6 @@ export default class DownloadPage extends React.Component<Props, State> {
 
   async componentDidMount() {
     try {
-      if (!this.key) return this.setState({loading: false});
       this.decryptedFilename = await utils.decryptedFilename(this.props.filename, new Uint8Array(JSON.parse(this.props.iv)), await this.getKey());
       this.setState({filename: this.decryptedFilename, loading: false})
     } catch(e) {
