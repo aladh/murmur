@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.23.0",
-    "bugsnag": "github:ali-l/bugsnag-node",
     "dropbox": "^2.5.4",
     "hi-base32": "^0.2.0",
     "react": "^15.6.1",
